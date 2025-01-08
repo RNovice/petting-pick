@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-// import "./App.css";
 
 const env = import.meta.env;
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = env;
@@ -54,16 +53,20 @@ function App() {
       getProducts();
       setIsLogin(true);
     } catch (err) {
-      console.log(err);
+      console.err(err);
       alert("Login Fail: \n" + err);
     }
   }
 
   async function handleLogout() {
-    const { status } = await axios.post(`${API_BASE}/logout`);
-    if (status === 200) {
-      document.cookie = "authToken; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-      setIsLogin(false);
+    try {
+      const { status } = await axios.post(`${API_BASE}/logout`);
+      if (status === 200) {
+        document.cookie = "authToken; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+        setIsLogin(false);
+      }
+    } catch (err) {
+      console.err(err);
     }
   }
 
