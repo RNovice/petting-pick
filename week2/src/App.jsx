@@ -191,7 +191,7 @@ function App() {
             <h2 className="text-center mb-4">Login</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <label htmlFor="email" className="form-label">
+                <label htmlFor="username" className="form-label">
                   Email address
                 </label>
                 <input
