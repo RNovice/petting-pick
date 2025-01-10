@@ -53,7 +53,7 @@ function App() {
       getProducts();
       setIsLogin(true);
     } catch (err) {
-      console.err(err);
+      console.error(err);
       alert("Login Fail: \n" + err);
     }
   }
