@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 
 const env = import.meta.env;
-const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = env;
+const { VITE_API_BASE: API_BASE } = env;
 
-const Login = ({ setIsLogin, getProducts }) => {
+const Login = ({ setIsLogin }) => {
   const [formData, setFormData] = useState({
     username: env.VITE_USERNAME || "",
     password: env.VITE_PASSWORD || "",
@@ -26,7 +26,6 @@ const Login = ({ setIsLogin, getProducts }) => {
       const { token, expired } = res.data;
       document.cookie = `authToken=${token};expires=${new Date(expired)};`;
       axios.defaults.headers.common.Authorization = token;
-      getProducts();
       setIsLogin(true);
     } catch (err) {
       console.error(err);
