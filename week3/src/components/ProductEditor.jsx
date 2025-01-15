@@ -24,7 +24,6 @@ const ProductEditor = ({ setIsLogin }) => {
   const [modalData, setModalData] = useState(emptyModalData());
   const [isEditMode, setIsEditMode] = useState(false);
   const modalRef = useRef(null);
-  const ogpref = useRef(null);
 
   useEffect(() => {
     getProducts();
@@ -322,7 +321,6 @@ const ProductEditor = ({ setIsLogin }) => {
                         Origin Price
                       </label>
                       <input
-                        ref={ogpref}
                         id="modal-input-origin_price"
                         type="text"
                         className="form-control"
