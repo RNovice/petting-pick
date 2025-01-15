@@ -321,6 +321,8 @@ const ProductEditor = ({ setIsLogin }) => {
                         Origin Price
                       </label>
                       <input
+                        aria-label="input origin price"
+                        inputMode="decimal"
                         id="modal-input-origin_price"
                         type="text"
                         className="form-control"
@@ -334,6 +336,8 @@ const ProductEditor = ({ setIsLogin }) => {
                         Price
                       </label>
                       <input
+                        aria-label="input price"
+                        inputMode="decimal"
                         id="modal-input-price"
                         type="text"
                         className="form-control"

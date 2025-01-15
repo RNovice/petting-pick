@@ -23,5 +23,6 @@
   padding: 0;
   width: 100vw;
   border: none;
+  outline: none;
   background-color: transparent;
 }
