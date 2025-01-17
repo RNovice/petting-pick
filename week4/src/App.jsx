@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import ProductEditor from "./components/ProductEditor";
-import Login from "./components/Login";
+import ProductEditor from "./pages/ProductBackOffice";
+import Login from "./pages/Login";
 
 const { VITE_API_BASE: API_BASE } = import.meta.env;
 

@@ -26,3 +26,13 @@
   outline: none;
   background-color: transparent;
 }
+
+.modal-env *::-webkit-scrollbar {
+  background-color: #f0f5fa;
+  width: .5rem;
+}
+
+.modal-env *::-webkit-scrollbar-thumb {
+  background: #cdd5e0;
+  border-radius: 10px;
+}
