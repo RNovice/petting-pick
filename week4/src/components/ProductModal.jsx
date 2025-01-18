@@ -1,4 +1,10 @@
-import { forwardRef, useRef, useImperativeHandle, Fragment } from "react";
+import {
+  useState,
+  forwardRef,
+  useRef,
+  useImperativeHandle,
+  Fragment,
+} from "react";
 import axios from "axios";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
@@ -6,6 +12,7 @@ const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 const ProductModal = forwardRef(
   ({ modalData, setModalData, isEditMode, getProducts }, ref) => {
     const modalRef = useRef(null);
+    const [uploadingId, setUploadingId] = useState(null);
 
     useImperativeHandle(ref, () => ({
       showModal: () => modalRef.current?.showModal(),
@@ -61,10 +68,33 @@ const ProductModal = forwardRef(
         getProducts();
         modalRef.current?.close();
       } catch (err) {
-        console.error(
-          `${id ? "Update" : "Add"} Failed`,
-          err?.response.data.message || err
+        const axiosError = err.response?.data.message;
+        console.error(`${id ? "Update" : "Add"} Failed`, axiosError || err);
+        axiosError && alert(axiosError.join`\n`);
+      }
+    }
+
+    async function handleImageUpload(e, index = null) {
+      setUploadingId(e.target.id);
+      try {
+        const file = e.target.files[0];
+        if (!file) return;
+        const formData = new FormData();
+        formData.append("file-to-upload", file);
+        const {
+          data: { imageUrl },
+        } = await axios.post(
+          `${API_BASE}/api/${API_PATH}/admin/upload`,
+          formData
         );
+        index === null
+          ? setModalData({ ...modalData, imageUrl })
+          : handleImagesInputChange(imageUrl, index);
+      } catch (err) {
+        console.error(err.response?.data.message || err);
+        e.target.value = "";
+      } finally {
+        setUploadingId(null);
       }
     }
 
@@ -92,14 +122,38 @@ const ProductModal = forwardRef(
                     >
                       Main Picture URL
                     </label>
-                    <input
-                      id="modal-input-main-img"
-                      type="text"
-                      className="form-control"
-                      name="imageUrl"
-                      value={modalData.imageUrl}
-                      onChange={handleInputChange}
-                    />
+                    <div className="d-flex gap-2">
+                      <label
+                        htmlFor="upload-main-img"
+                        className="btn btn-sm btn-primary d-flex align-items-center"
+                      >
+                        <span className="material-symbols-outlined">
+                          upload
+                        </span>
+                        <input
+                          className="d-none"
+                          type="file"
+                          id="upload-main-img"
+                          accept="image/*"
+                          onClick={(e) =>
+                            uploadingId !== null && e.preventDefault()
+                          }
+                          onChange={(e) => handleImageUpload(e)}
+                        />
+                      </label>
+                      {uploadingId === "upload-main-img" ? (
+                        <div className="uploading form-control">上傳中</div>
+                      ) : (
+                        <input
+                          id="modal-input-main-img"
+                          type="text"
+                          className="form-control"
+                          name="imageUrl"
+                          value={modalData.imageUrl}
+                          onChange={handleInputChange}
+                        />
+                      )}
+                    </div>
                   </div>
                   <label
                     className="mb-3 ratio ratio-16x9"
@@ -114,16 +168,40 @@ const ProductModal = forwardRef(
                   </label>
                   {modalData.imagesUrl.map((url, i) => (
                     <Fragment key={`modal-input-other-img-${i + 1}`}>
-                      <input
-                        id={`modal-input-other-img-${i + 1}`}
-                        type="text"
-                        value={url}
-                        onChange={(e) =>
-                          handleImagesInputChange(e.target.value, i)
-                        }
-                        placeholder={`Image URL ${i + 1}`}
-                        className="form-control mb-2"
-                      />
+                      <div className="d-flex gap-2">
+                        <label
+                          htmlFor={`upload-other-img-${i + 1}`}
+                          className="btn btn-sm btn-primary d-flex align-items-center"
+                        >
+                          <span className="material-symbols-outlined">
+                            upload
+                          </span>
+                          <input
+                            className="d-none"
+                            type="file"
+                            id={`upload-other-img-${i + 1}`}
+                            accept="image/*"
+                            onClick={(e) =>
+                              uploadingId !== null && e.preventDefault()
+                            }
+                            onChange={(e) => handleImageUpload(e, i)}
+                          />
+                        </label>
+                        {uploadingId === `upload-other-img-${i + 1}` ? (
+                          <div className="uploading form-control">上傳中</div>
+                        ) : (
+                          <input
+                            id={`modal-input-other-img-${i + 1}`}
+                            type="text"
+                            value={url}
+                            onChange={(e) =>
+                              handleImagesInputChange(e.target.value, i)
+                            }
+                            placeholder={`Image URL ${i + 1}`}
+                            className="form-control mb-2"
+                          />
+                        )}
+                      </div>
                       {url !== "" && (
                         <label
                           className="mb-3 ratio ratio-16x9"
@@ -163,7 +241,10 @@ const ProductModal = forwardRef(
                 </div>
                 <div className="col">
                   <div className="mb-3">
-                    <label className="form-label" htmlFor="modal-input-title">
+                    <label
+                      className="form-label required-field"
+                      htmlFor="modal-input-title"
+                    >
                       Title
                     </label>
                     <input
@@ -178,7 +259,7 @@ const ProductModal = forwardRef(
                   <div className="row">
                     <div className="col-md-6 mb-3">
                       <label
-                        className="form-label"
+                        className="form-label required-field"
                         htmlFor="modal-input-category"
                       >
                         Category
@@ -193,7 +274,10 @@ const ProductModal = forwardRef(
                       />
                     </div>
                     <div className="col-md-6 mb-3">
-                      <label className="form-label" htmlFor="modal-input-unit">
+                      <label
+                        className="form-label required-field"
+                        htmlFor="modal-input-unit"
+                      >
                         Unit
                       </label>
                       <input

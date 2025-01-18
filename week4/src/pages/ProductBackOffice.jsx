@@ -40,6 +40,7 @@ const ProductBackOffice = ({ setIsLogin }) => {
 
   async function handleDeleteProduct(id) {
     try {
+      if (!confirm("Are you sure you want to delete this product")) return;
       await axios.delete(`${API_BASE}/api/${API_PATH}/admin/product/${id}`);
       getProducts();
     } catch (err) {
