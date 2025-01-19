@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import ProductModal from "@/components/ProductModal";
+import Paginator from "@/components/Paginator";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 
@@ -22,6 +23,8 @@ const ProductBackOffice = ({ setIsLogin }) => {
   const [products, setProducts] = useState([]);
   const [modalData, setModalData] = useState(emptyModalData());
   const [isEditMode, setIsEditMode] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const modalRef = useRef(null);
 
   useEffect(() => {
@@ -60,13 +63,26 @@ const ProductBackOffice = ({ setIsLogin }) => {
     }
   }
 
-  async function getProducts() {
+  async function getProducts(page = null) {
     try {
-      const res = await axios.get(`${API_BASE}/api/${API_PATH}/admin/products`);
-      setProducts(res.data.products);
+      const {
+        data: { products, pagination },
+      } = await axios.get(
+        `${API_BASE}/api/${API_PATH}/admin/products${
+          page ? `?page=${page}` : ""
+        }`
+      );
+      setCurrentPage(pagination.current_page);
+      setTotalPages(pagination.total_pages);
+      setProducts(products);
     } catch (err) {
       console.error(err);
     }
+  }
+
+  function onPageChange(page) {
+    setCurrentPage(page);
+    getProducts(page);
   }
 
   return (
@@ -119,6 +135,13 @@ const ProductBackOffice = ({ setIsLogin }) => {
           ))}
         </tbody>
       </table>
+      {totalPages > 1 && (
+        <Paginator
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+        />
+      )}
       <ProductModal
         ref={modalRef}
         modalData={modalData}
