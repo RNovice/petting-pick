@@ -21,15 +21,17 @@ const ProductModal = forwardRef(
 
     function handleInputChange(e) {
       const { name, value, type, checked } = e.target;
-      setModalData({
-        ...modalData,
-        [name]:
-          type === "checkbox"
-            ? +checked
-            : name.includes("price")
-            ? value.replace(/[^1-9.]|(?<=\..*)\./g, "").replace(/^\./, "")
-            : value,
-      });
+
+      const updatedValue =
+        type === "checkbox"
+          ? +checked
+          : name === "rating"
+          ? Math.min(+value.replace(/\D/g, ""), 10)
+          : name.includes("price")
+          ? value.replace(/[^0-9.]|(?<=\..*)\./g, "").replace(/^\./, "")
+          : value;
+
+      setModalData({ ...modalData, [name]: updatedValue });
     }
 
     function handleImagesInputChange(value, index) {
@@ -116,10 +118,7 @@ const ProductModal = forwardRef(
               <div className="row">
                 <div className="col">
                   <div className="mb-3">
-                    <label
-                      className="form-label"
-                      htmlFor="modal-input-main-img"
-                    >
+                    <label htmlFor="modal-input-main-img">
                       Main Picture URL
                     </label>
                     <div className="d-flex gap-2">
@@ -242,7 +241,7 @@ const ProductModal = forwardRef(
                 <div className="col">
                   <div className="mb-3">
                     <label
-                      className="form-label required-field"
+                      className=" required-field"
                       htmlFor="modal-input-title"
                     >
                       Title
@@ -259,7 +258,7 @@ const ProductModal = forwardRef(
                   <div className="row">
                     <div className="col-md-6 mb-3">
                       <label
-                        className="form-label required-field"
+                        className=" required-field"
                         htmlFor="modal-input-category"
                       >
                         Category
@@ -275,7 +274,7 @@ const ProductModal = forwardRef(
                     </div>
                     <div className="col-md-6 mb-3">
                       <label
-                        className="form-label required-field"
+                        className=" required-field"
                         htmlFor="modal-input-unit"
                       >
                         Unit
@@ -292,10 +291,7 @@ const ProductModal = forwardRef(
                   </div>
                   <div className="row">
                     <div className="col-md-6 mb-3">
-                      <label
-                        className="form-label"
-                        htmlFor="modal-input-origin_price"
-                      >
+                      <label htmlFor="modal-input-origin_price">
                         Origin Price
                       </label>
                       <input
@@ -310,9 +306,7 @@ const ProductModal = forwardRef(
                       />
                     </div>
                     <div className="col-md-6 mb-3">
-                      <label className="form-label" htmlFor="modal-input-price">
-                        Price
-                      </label>
+                      <label htmlFor="modal-input-price">Price</label>
                       <input
                         aria-label="input price"
                         inputMode="decimal"
@@ -326,12 +320,7 @@ const ProductModal = forwardRef(
                     </div>
                   </div>
                   <div className="mb-3">
-                    <label
-                      className="form-label"
-                      htmlFor="modal-input-description"
-                    >
-                      Description
-                    </label>
+                    <label htmlFor="modal-input-description">Description</label>
                     <textarea
                       id="modal-input-description"
                       className="form-control"
@@ -342,9 +331,7 @@ const ProductModal = forwardRef(
                     ></textarea>
                   </div>
                   <div className="mb-3">
-                    <label className="form-label" htmlFor="modal-input-content">
-                      Content
-                    </label>
+                    <label htmlFor="modal-input-content">Content</label>
                     <textarea
                       id="modal-input-content"
                       className="form-control"
@@ -354,21 +341,40 @@ const ProductModal = forwardRef(
                       onChange={handleInputChange}
                     ></textarea>
                   </div>
-                  <div className="form-check">
-                    <input
-                      id="modal-input-is_enabled"
-                      type="checkbox"
-                      className="form-check-input"
-                      name="is_enabled"
-                      checked={modalData.is_enabled ? true : false}
-                      onChange={handleInputChange}
-                    />
-                    <label
-                      className="form-check-label"
-                      htmlFor="modal-input-is_enabled"
-                    >
-                      Is Enable
-                    </label>
+                  <div className="row">
+                    <div className="col-md-6">
+                      <label htmlFor="modal-input-rating">Rating</label>
+                      <input
+                        aria-label="input origin price"
+                        inputMode="numeric"
+                        id="modal-input-rating"
+                        type="text"
+                        className="form-control"
+                        style={{
+                          float: "unset",
+                          marginLeft: "unset",
+                        }}
+                        name="rating"
+                        value={modalData.rating}
+                        onChange={handleInputChange}
+                      />
+                    </div>
+                    <div className="form-check col-md-6 d-flex align-items-center gap-3">
+                      <input
+                        id="modal-input-is_enabled"
+                        type="checkbox"
+                        className="form-check-input"
+                        name="is_enabled"
+                        checked={modalData.is_enabled ? true : false}
+                        onChange={handleInputChange}
+                      />
+                      <label
+                        className="form-check-label"
+                        htmlFor="modal-input-is_enabled"
+                      >
+                        Is Enable
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>

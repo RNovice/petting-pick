@@ -17,6 +17,7 @@ const emptyModalData = () => ({
   content: "",
   is_enabled: 0,
   id: "",
+  rating: "",
 });
 
 const ProductBackOffice = ({ setIsLogin }) => {
