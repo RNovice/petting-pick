@@ -167,7 +167,7 @@ const ProductModal = forwardRef(
                   </label>
                   {modalData.imagesUrl.map((url, i) => (
                     <Fragment key={`modal-input-other-img-${i + 1}`}>
-                      <div className="d-flex gap-2">
+                      <div className="d-flex gap-2 mb-3">
                         <label
                           htmlFor={`upload-other-img-${i + 1}`}
                           className="btn btn-sm btn-primary d-flex align-items-center"
