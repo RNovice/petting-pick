@@ -197,7 +197,7 @@ const ProductModal = forwardRef(
                               handleImagesInputChange(e.target.value, i)
                             }
                             placeholder={`Image URL ${i + 1}`}
-                            className="form-control mb-2"
+                            className="form-control"
                           />
                         )}
                       </div>
