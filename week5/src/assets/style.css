@@ -1,0 +1,30 @@
+.required-field::after {
+  padding-left: 5px;
+  color: #f85149;
+  content: "*";
+}
+
+.uploading{
+  user-select: none;
+  cursor: not-allowed;
+
+}
+
+.uploading::after {
+  content: '';
+  animation: loading 1s linear infinite;
+}
+
+@keyframes loading {
+  33% {
+    content: '.';
+  }
+
+  66% {
+    content: '..';
+  }
+
+  99% {
+    content: '...';
+  }
+}
