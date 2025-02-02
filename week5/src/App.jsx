@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import ProductEditor from "./pages/ProductBackOffice";
+import { Routes, Route, Navigate } from "react-router";
+import ProductBackOffice from "./pages/ProductBackOffice";
 import Login from "./pages/Login";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AuthWrapper from "./components/auth/AuthWrapper";
+import Shop from "./pages/Shop";
 
 const { VITE_API_BASE: API_BASE } = import.meta.env;
 
@@ -29,13 +33,26 @@ function App() {
   }, []);
 
   return (
-    <>
-      {isLogin ? (
-        <ProductEditor setIsLogin={setIsLogin} />
-      ) : (
-        <Login setIsLogin={setIsLogin} />
-      )}
-    </>
+    <Routes>
+      <Route
+        path="/login"
+        element={
+          <AuthWrapper isAuth={isLogin} to={"/product-back-office"}>
+            <Login setIsLogin={setIsLogin} />
+          </AuthWrapper>
+        }
+      />
+      <Route
+        path="/product-back-office"
+        element={
+          <ProtectedRoute isAuth={isLogin}>
+            <ProductBackOffice setIsLogin={setIsLogin} />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="/shop" element={<Shop />} />
+      <Route path="*" element={<Navigate to="/shop" />} />
+    </Routes>
   );
 }
 

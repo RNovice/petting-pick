@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import ProductModal from "@/components/ProductModal";
-import Paginator from "@/components/Paginator";
+import ProductModal from "@/components/backoffice/ProductModal";
+import Paginator from "@/components/common/Paginator";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 
