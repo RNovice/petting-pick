@@ -1,115 +1,25 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { startLoading, stopLoading } from "@/slice/loadingSlice";
 import axios from "axios";
-import ReactLoading from "react-loading";
-import ProductDetailModal from "../components/shop/ProductDetailModal";
-import Paginator from "../components/common/Paginator";
-import AsideCart from "../components/shop/AsideCart";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 
-const Shop = () => {
+const Cart = () => {
+  const [cart, setCart] = useState([]);
+  const [cartTotal, setCartTotal] = useState(0);
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm();
-  const [products, setProducts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [cart, setCart] = useState([]);
-  const [cartTotal, setCartTotal] = useState(0);
-  const [viewProduct, setViewProduct] = useState({});
-  const [notifications, setNotifications] = useState({
-    msg: null,
-    type: "",
-    key: 0,
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [isAsideCartLoading, setIsAsideCartLoading] = useState(false);
-  const modalRef = useRef(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    getProducts();
     getCart();
   }, []);
-
-  async function handleAddToCart(id) {
-    try {
-      setIsLoading(true);
-      await axios.post(`${API_BASE}/api/${API_PATH}/cart`, {
-        data: { product_id: id, qty: 1 },
-      });
-      await getCart();
-      const key = Date.now();
-      setNotifications({ msg: "Item Added", type: "success", key });
-    } catch (err) {
-      const axiosError = err.response?.data?.message;
-      console.error("Get Product Failed", axiosError || err);
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  function handleShowDetails(product) {
-    setViewProduct(product);
-    modalRef.current?.showModal();
-  }
-
-  async function handleCartItemUpdate(product_id, qty, isAsideCart = false) {
-    const setLoading = isAsideCart ? setIsAsideCartLoading : setIsLoading;
-    try {
-      setLoading(true);
-      const url = `${API_BASE}/api/${API_PATH}/cart/${product_id}`;
-      qty > 0
-        ? await axios.put(url, { data: { product_id, qty } })
-        : await axios.delete(url);
-      await getCart();
-    } catch (err) {
-      const axiosError = err.response?.data?.message;
-      console.error("Get Product Failed", axiosError || err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleRemoveFromCart(id = null, isAsideCart = false) {
-    const setLoading = isAsideCart ? setIsAsideCartLoading : setIsLoading;
-    try {
-      setLoading(true)
-      await axios.delete(
-        `${API_BASE}/api/${API_PATH}/cart${id === null ? "s" : `/${id}`}`
-      );
-      await getCart();
-    } catch (err) {
-      const axiosError = err.response?.data?.message;
-      console.error("Get Product Failed", axiosError || err);
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const getProducts = async (page = null) => {
-    try {
-      const {
-        data: { products, pagination },
-      } = await axios(
-        `${API_BASE}/api/${API_PATH}/products${page ? `?page=${page}` : ""}`
-      );
-      setCurrentPage(pagination.current_page);
-      setTotalPages(pagination.total_pages);
-      setProducts(products);
-    } catch (err) {
-      const axiosError = err.response?.data?.message;
-      console.error("Get Product Failed", axiosError || err);
-    }
-  };
-
-  const onPageChange = (page) => {
-    setCurrentPage(page);
-    getProducts(page);
-  };
 
   const getCart = async () => {
     try {
@@ -126,9 +36,40 @@ const Shop = () => {
     }
   };
 
+  async function handleCartItemUpdate(product_id, qty) {
+    try {
+      dispatch(startLoading());
+      const url = `${API_BASE}/api/${API_PATH}/cart/${product_id}`;
+      qty > 0
+        ? await axios.put(url, { data: { product_id, qty } })
+        : await axios.delete(url);
+      await getCart();
+    } catch (err) {
+      const axiosError = err.response?.data?.message;
+      console.error("Get Product Failed", axiosError || err);
+    } finally {
+      dispatch(stopLoading());
+    }
+  }
+
+  async function handleRemoveFromCart(id = null) {
+    try {
+      dispatch(startLoading());
+      await axios.delete(
+        `${API_BASE}/api/${API_PATH}/cart${id === null ? "s" : `/${id}`}`
+      );
+      await getCart();
+    } catch (err) {
+      const axiosError = err.response?.data?.message;
+      console.error("Get Product Failed", axiosError || err);
+    } finally {
+      dispatch(stopLoading());
+    }
+  }
+
   const submitOrder = async (user) => {
     try {
-      setIsLoading(true);
+      dispatch(startLoading());
       if (cart.length === 0)
         return setNotifications({
           msg: "Shopping Cart is Empty",
@@ -146,64 +87,12 @@ const Shop = () => {
       const axiosError = err.response?.data?.message;
       console.error("Get Product Failed", axiosError || err);
     } finally {
-      setIsLoading(false)
+      dispatch(stopLoading());
     }
   };
 
   return (
     <div className="container my-4">
-      <AsideCart
-        cart={cart}
-        cartTotal={cartTotal}
-        handleCartItemUpdate={handleCartItemUpdate}
-        handleRemoveFromCart={handleRemoveFromCart}
-        notifications={notifications}
-        isAsideCartLoading={isAsideCartLoading}
-      />
-      <div className="row mb-5">
-        <h2>Products</h2>
-        {products.map((product) => (
-          <div className="col-md-4 mb-3" key={`shop-product-${product.id}`}>
-            <div className="card h-100">
-              <div className="ratio ratio-4x3">
-                <img
-                  src={product.imageUrl}
-                  className="card-img-top"
-                  alt={product.title}
-                  style={{ objectFit: "cover", objectPosition: "center" }}
-                />
-              </div>
-              <div className="card-body">
-                <h5 className="card-title">{product.title}</h5>
-                <small>
-                  <s>${product.origin_price}</s>
-                </small>
-                <p className="card-text">${product.price}</p>
-                <button
-                  className="btn btn-primary me-2"
-                  onClick={() => handleAddToCart(product.id)}
-                >
-                  Add to Cart
-                </button>
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => handleShowDetails(product)}
-                >
-                  More Details
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
-        {totalPages > 1 && (
-          <Paginator
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={onPageChange}
-          />
-        )}
-      </div>
-      <ProductDetailModal ref={modalRef} modalData={viewProduct} />
       <div className="mb-5">
         <h2 className="d-flex">
           Cart
@@ -218,6 +107,7 @@ const Shop = () => {
           <table className="table table-bordered">
             <thead>
               <tr>
+                <th>Preview</th>
                 <th>Name</th>
                 <th>Amount</th>
                 <th>Price</th>
@@ -226,7 +116,17 @@ const Shop = () => {
             </thead>
             <tbody>
               {cart.map((item) => (
-                <tr key={`cart-item-${item.id}`}>
+                <tr className="align-middle" key={`cart-item-${item.id}`}>
+                  <td className="p-1">
+                    <div className="ratio ratio-16x9 m-auto">
+                      <img
+                        src={item?.product.imageUrl}
+                        className="card-img-top rounded"
+                        alt={item?.product.title}
+                        style={{ objectFit: "cover", objectPosition: "center" }}
+                      />
+                    </div>
+                  </td>
                   <td>{item.product?.title}</td>
                   <td>
                     <input
@@ -322,29 +222,12 @@ const Shop = () => {
             ></textarea>
           </div>
           <button type="submit" className="btn btn-success">
-            Submit
+            Submit Order
           </button>
         </form>
       </div>
-      {isLoading && (
-        <div
-          className="d-flex justify-content-center align-items-center position-fixed"
-          style={{
-            inset: 0,
-            backgroundColor: "#4444",
-            zIndex: 100,
-          }}
-        >
-          <ReactLoading
-            type="spinningBubbles"
-            color="#fff"
-            width="5rem"
-            height="5rem"
-          />
-        </div>
-      )}
     </div>
   );
 };
 
-export default Shop;
+export default Cart;

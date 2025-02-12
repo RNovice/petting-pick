@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import ProductModal from "@/components/backoffice/ProductModal";
+import ProductModal from "@/components/admin/ProductModal";
 import Paginator from "@/components/common/Paginator";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
@@ -20,8 +20,8 @@ const emptyModalData = () => ({
   rating: "",
 });
 
-const ProductBackOffice = ({ setIsLogin }) => {
-  const [products, setProducts] = useState([]);
+const OrderManagement = () => {
+  const [orders, setOrders] = useState([]);
   const [modalData, setModalData] = useState(emptyModalData());
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,7 +29,7 @@ const ProductBackOffice = ({ setIsLogin }) => {
   const modalRef = useRef(null);
 
   useEffect(() => {
-    getProducts();
+    getOrders();
   }, []);
 
   function handleModalOperation(isEditMethod, product = emptyModalData()) {
@@ -46,36 +46,24 @@ const ProductBackOffice = ({ setIsLogin }) => {
     try {
       if (!confirm("Are you sure you want to delete this product")) return;
       await axios.delete(`${API_BASE}/api/${API_PATH}/admin/product/${id}`);
-      getProducts();
+      getOrders();
     } catch (err) {
       console.error("Delete Failed", err);
     }
   }
 
-  async function handleLogout() {
-    try {
-      const { status } = await axios.post(`${API_BASE}/logout`);
-      if (status === 200) {
-        document.cookie = "authToken; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-        setIsLogin(false);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  async function getProducts(page = null) {
+  async function getOrders(page = null) {
     try {
       const {
-        data: { products, pagination },
+        data: { orders, pagination },
       } = await axios.get(
-        `${API_BASE}/api/${API_PATH}/admin/products${
+        `${API_BASE}/api/${API_PATH}/admin/orders${
           page ? `?page=${page}` : ""
         }`
       );
       setCurrentPage(pagination.current_page);
       setTotalPages(pagination.total_pages);
-      setProducts(products);
+      setOrders(orders);
     } catch (err) {
       console.error(err);
     }
@@ -83,43 +71,42 @@ const ProductBackOffice = ({ setIsLogin }) => {
 
   function onPageChange(page) {
     setCurrentPage(page);
-    getProducts(page);
+    getOrders(page);
   }
 
   return (
     <div className="container mt-4">
-      <div className="d-flex justify-content-between mb-4">
-        <button className="btn btn-danger" onClick={handleLogout}>
-          Logout
-        </button>
+      <div className="d-flex justify-content-end mb-4">
         <button
           className="btn btn-primary"
           onClick={() => handleModalOperation(false)}
+          disabled
         >
-          Add New Product
+          Delete All Orders (disabled)
         </button>
       </div>
       <table className="table table-bordered">
         <thead>
           <tr>
-            <th>Category</th>
-            <th>Title</th>
-            <th>Origin Price</th>
-            <th>Price</th>
-            <th>Is Enable</th>
+            <th>User</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Address</th>
+            <th>Is Paid</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {products.map((product, index) => (
+          {orders?.map(({user, is_paid}, index) => (
             <tr key={index}>
-              <td>{product.category}</td>
-              <td>{product.title}</td>
-              <td>{product.origin_price}</td>
-              <td>{product.price}</td>
-              <td>{product.is_enabled ? "Yes" : "No"}</td>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+              <td>{user.tel}</td>
+              <td>{user.address}</td>
+              <td>{is_paid ? "Yes" : "No"}</td>
               <td>
-                <button
+                N/A
+                {/* <button
                   className="btn btn-warning btn-sm me-2"
                   onClick={() => handleModalOperation(true, product)}
                 >
@@ -130,7 +117,7 @@ const ProductBackOffice = ({ setIsLogin }) => {
                   onClick={() => handleDeleteProduct(product.id)}
                 >
                   Delete
-                </button>
+                </button> */}
               </td>
             </tr>
           ))}
@@ -148,10 +135,10 @@ const ProductBackOffice = ({ setIsLogin }) => {
         modalData={modalData}
         setModalData={setModalData}
         isEditMode={isEditMode}
-        getProducts={getProducts}
+        getProducts={getOrders}
       />
     </div>
   );
 };
 
-export default ProductBackOffice;
+export default OrderManagement;

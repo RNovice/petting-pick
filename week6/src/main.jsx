@@ -1,18 +1,17 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, HashRouter } from "react-router";
+import { Provider } from "react-redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./assets/bootstrap-replacement.css";
 import "./assets/bootstrap.min.css";
 import "./assets/style.css";
-
+import store from "./store";
 import App from "./App.jsx";
-const Router =
-  process.env.NODE_ENV === "production" ? HashRouter : BrowserRouter;
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <Router>
+    <Provider store={store}>
       <App />
-    </Router>
+    </Provider>
   </StrictMode>
 );

@@ -1,14 +1,33 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { loginAdmin } from "@/slice/authSlice";
+import { Link } from "react-router-dom";
+import { startLoading, stopLoading } from "@/slice/loadingSlice";
 
 const env = import.meta.env;
-const { VITE_API_BASE: API_BASE } = env;
 
-const Login = ({ setIsLogin }) => {
+const Login = () => {
   const [formData, setFormData] = useState({
     username: env.VITE_USERNAME || "",
     password: env.VITE_PASSWORD || "",
   });
+  const { status } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    status === "checking"
+      ? dispatch(
+          startLoading({
+            text: "Checking Authentication",
+            color: "#aaa",
+            bgColor: "#fff",
+          })
+        )
+      : dispatch(stopLoading());
+    return () => {
+      dispatch(stopLoading());
+    };
+  }, [status]);
 
   function handleInput(e) {
     const { name, value } = e.target;
@@ -20,17 +39,7 @@ const Login = ({ setIsLogin }) => {
 
   async function handleSubmit(e) {
     e.preventDefault();
-
-    try {
-      const res = await axios.post(`${API_BASE}/admin/signin`, formData);
-      const { token, expired } = res.data;
-      document.cookie = `authToken=${token};expires=${new Date(expired)};`;
-      axios.defaults.headers.common.Authorization = token;
-      setIsLogin(true);
-    } catch (err) {
-      console.error(err);
-      alert("Login Fail: \n" + err);
-    }
+    dispatch(loginAdmin(formData));
   }
 
   return (
@@ -71,15 +80,22 @@ const Login = ({ setIsLogin }) => {
               onInput={handleInput}
             />
           </div>
-          <button type="submit" className="btn btn-primary w-100">
-            Login
-          </button>
+          {["loading", "checking"].includes(status) ? (
+            <button
+              disabled
+              type="submit"
+              className="loading-text btn btn-primary w-100"
+            >
+              {status === "loading" ? "Logging in" : "Checking login"}
+            </button>
+          ) : (
+            <button type="submit" className="btn btn-primary w-100">
+              Login
+            </button>
+          )}
         </form>
         <p className="text-center mt-3">
-          Don't have an account?{" "}
-          <a href="https://ec-course-api.hexschool.io/" target="_blank">
-            Register here
-          </a>
+          Go back to home page? <Link to="/">Click here</Link>
         </p>
       </div>
     </div>

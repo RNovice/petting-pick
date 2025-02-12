@@ -13,12 +13,13 @@ body:has(dialog[open]) {
   content: "*";
 }
 
+.loading-text,
 .uploading {
   user-select: none;
   cursor: not-allowed;
-
 }
 
+.loading-text::after,
 .uploading::after {
   content: '';
   animation: loading 1s linear infinite;
