@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
+import { getCart, updateCartItem, removeCartItem } from "@/slice/cartSlice";
 import axios from "axios";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 
 const Cart = () => {
-  const [cart, setCart] = useState([]);
-  const [cartTotal, setCartTotal] = useState(0);
+  const { cart, cartTotal } = useSelector((state) => state.cart);
   const {
     register,
     handleSubmit,
@@ -17,36 +16,10 @@ const Cart = () => {
   } = useForm();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    getCart();
-  }, []);
-
-  const getCart = async () => {
-    try {
-      const {
-        data: {
-          data: { carts, final_total },
-        },
-      } = await axios(`${API_BASE}/api/${API_PATH}/cart`);
-      setCart(carts);
-      setCartTotal(final_total);
-    } catch (err) {
-      const axiosError = err.response?.data?.message;
-      console.error("Get Cart Failed", axiosError || err);
-    }
-  };
-
   async function handleCartItemUpdate(product_id, qty) {
     try {
       dispatch(startLoading());
-      const url = `${API_BASE}/api/${API_PATH}/cart/${product_id}`;
-      qty > 0
-        ? await axios.put(url, { data: { product_id, qty } })
-        : await axios.delete(url);
-      await getCart();
-    } catch (err) {
-      const axiosError = err.response?.data?.message;
-      console.error("Get Product Failed", axiosError || err);
+      await dispatch(updateCartItem({ product_id, qty }));
     } finally {
       dispatch(stopLoading());
     }
@@ -55,13 +28,7 @@ const Cart = () => {
   async function handleRemoveFromCart(id = null) {
     try {
       dispatch(startLoading());
-      await axios.delete(
-        `${API_BASE}/api/${API_PATH}/cart${id === null ? "s" : `/${id}`}`
-      );
-      await getCart();
-    } catch (err) {
-      const axiosError = err.response?.data?.message;
-      console.error("Get Product Failed", axiosError || err);
+      await dispatch(removeCartItem(id));
     } finally {
       dispatch(stopLoading());
     }
@@ -81,7 +48,7 @@ const Cart = () => {
         data: { user, message },
       });
       reset();
-      await getCart();
+      await dispatch(getCart());
       alert("Order successfully");
     } catch (err) {
       const axiosError = err.response?.data?.message;
@@ -96,12 +63,15 @@ const Cart = () => {
       <div className="mb-5">
         <h2 className="d-flex">
           Cart
-          <button
-            className="btn btn-outline-danger ms-auto"
-            onClick={() => handleRemoveFromCart()}
-          >
-            Clear Cart
-          </button>
+          {cart.length > 0 && (
+            <button
+              className="btn btn-outline-danger ms-auto"
+              onClick={() => handleRemoveFromCart()}
+              disabled={cart.length === 0}
+            >
+              Clear Cart
+            </button>
+          )}
         </h2>
         {cart.length > 0 ? (
           <table className="table table-bordered">
@@ -152,7 +122,7 @@ const Cart = () => {
             </tbody>
           </table>
         ) : (
-          <p className="fs-5">No items in the cart.</p>
+          <p className="fs-5 text-danger">No items in the cart.</p>
         )}
         <h4>Total: ${cartTotal}</h4>
       </div>
@@ -221,7 +191,11 @@ const Cart = () => {
               {...register("message")}
             ></textarea>
           </div>
-          <button type="submit" className="btn btn-success">
+          <button
+            type="submit"
+            className="btn btn-success"
+            disabled={cart.length === 0}
+          >
             Submit Order
           </button>
         </form>

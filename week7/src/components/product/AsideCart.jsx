@@ -1,28 +1,22 @@
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { updateCartItem, removeCartItem } from "@/slice/cartSlice";
 import ReactLoading from "react-loading";
 import shoppingCartSvg from "@/assets/shopping-cart.svg";
 import trashCanSvg from "@/assets/trash-can.svg";
 
-const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
-
-const AsideCart = ({ cart, cartTotal, notifications, getCart }) => {
+const AsideCart = ({ notifications }) => {
+  const { cart, cartTotal } = useSelector((state) => state.cart);
   const [isAsideCartLoading, setIsAsideCartLoading] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const cartRef = useRef(null);
 
   async function handleCartItemUpdate(product_id, qty) {
     try {
       setIsAsideCartLoading(true);
-      const url = `${API_BASE}/api/${API_PATH}/cart/${product_id}`;
-      qty > 0
-        ? await axios.put(url, { data: { product_id, qty } })
-        : await axios.delete(url);
-      await getCart();
-    } catch (err) {
-      const axiosError = err.response?.data?.message;
-      console.error("Get Product Failed", axiosError || err);
+      await dispatch(updateCartItem({ product_id, qty }));
     } finally {
       setIsAsideCartLoading(false);
     }
@@ -31,13 +25,7 @@ const AsideCart = ({ cart, cartTotal, notifications, getCart }) => {
   async function handleRemoveFromCart(id = null) {
     try {
       setIsAsideCartLoading(true);
-      await axios.delete(
-        `${API_BASE}/api/${API_PATH}/cart${id === null ? "s" : `/${id}`}`
-      );
-      await getCart();
-    } catch (err) {
-      const axiosError = err.response?.data?.message;
-      console.error("Get Product Failed", axiosError || err);
+      await dispatch(removeCartItem(id));
     } finally {
       setIsAsideCartLoading(false);
     }
@@ -127,20 +115,25 @@ const AsideCart = ({ cart, cartTotal, notifications, getCart }) => {
             </tbody>
           </table>
         ) : (
-          <p className="fs-5">No items in the cart.</p>
+          <p className="fs-5 text-danger">No items in the cart.</p>
         )}
         <h4 className="d-flex gap-3 align-items-center">
           Total: ${cartTotal}
-          <div className="ms-auto">
+          <div
+            className="ms-auto"
+            style={cart.length === 0 ? { visibility: "hidden" } : undefined}
+          >
             <button
               className="btn btn-outline-primary btn-sm me-2"
               onClick={() => navigate("/cart")}
+              disabled={cart.length === 0}
             >
               Checkout
             </button>
             <button
               className="btn btn-outline-danger btn-sm"
               onClick={() => handleRemoveFromCart(null)}
+              disabled={cart.length === 0}
             >
               Clear Cart
             </button>

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
+import { addCartItem } from "@/slice/cartSlice";
 import ratingSvg from "@/assets/rating.svg";
+import AsideCart from "./AsideCart";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 
@@ -12,6 +14,11 @@ const ProductDetail = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const [productData, setProducts] = useState(location.state || {});
+  const [notifications, setNotifications] = useState({
+    msg: null,
+    type: "",
+    key: 0,
+  });
 
   useEffect(() => {
     if (!productData.id) {
@@ -32,12 +39,11 @@ const ProductDetail = () => {
   async function handleAddToCart(id) {
     try {
       dispatch(startLoading());
-      await axios.post(`${API_BASE}/api/${API_PATH}/cart`, {
-        data: { product_id: id, qty: 1 },
-      });
+      await dispatch(addCartItem(id));
+      const key = Date.now();
+      setNotifications({ msg: "Item Added", type: "success", key });
     } catch (err) {
-      const axiosError = err.response?.data?.message;
-      console.error("Get Product Failed", axiosError || err);
+      console.error(err);
     } finally {
       dispatch(stopLoading());
     }
@@ -49,6 +55,7 @@ const ProductDetail = () => {
 
   return (
     <div className="container my-5">
+    <AsideCart notifications={notifications} />
       <div className="row">
         <div className="col-md-6">
           <div className="ratio ratio-4x3">

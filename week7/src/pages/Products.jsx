@@ -1,7 +1,8 @@
-import { useEffect, useState, useRef } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
+import { addCartItem } from "@/slice/cartSlice";
 import { updateProduct } from "@/slice/productSlice";
 import Paginator from "../components/common/Paginator";
 import AsideCart from "../components/product/AsideCart";
@@ -14,8 +15,6 @@ const Products = () => {
   const { total_pages: totalPages, current_page: currentPage } = useSelector(
     (state) => state.products?.pagination
   );
-  const [cart, setCart] = useState([]);
-  const [cartTotal, setCartTotal] = useState(0);
   const [notifications, setNotifications] = useState({
     msg: null,
     type: "",
@@ -24,22 +23,15 @@ const Products = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    getCart();
-  }, []);
 
   async function handleAddToCart(id) {
     try {
       dispatch(startLoading());
-      await axios.post(`${API_BASE}/api/${API_PATH}/cart`, {
-        data: { product_id: id, qty: 1 },
-      });
-      await getCart();
+      await dispatch(addCartItem(id));
       const key = Date.now();
       setNotifications({ msg: "Item Added", type: "success", key });
     } catch (err) {
-      const axiosError = err.response?.data?.message;
-      console.error("Get Product Failed", axiosError || err);
+      console.error(err);
     } finally {
       dispatch(stopLoading());
     }
@@ -67,29 +59,9 @@ const Products = () => {
     getProducts(page);
   };
 
-  const getCart = async () => {
-    try {
-      const {
-        data: {
-          data: { carts, final_total },
-        },
-      } = await axios(`${API_BASE}/api/${API_PATH}/cart`);
-      setCart(carts);
-      setCartTotal(final_total);
-    } catch (err) {
-      const axiosError = err.response?.data?.message;
-      console.error("Get Cart Failed", axiosError || err);
-    }
-  };
-
   return (
     <div className="container my-4">
-      <AsideCart
-        cart={cart}
-        cartTotal={cartTotal}
-        notifications={notifications}
-        getCart={getCart}
-      />
+      <AsideCart notifications={notifications} />
       <div className="row mb-5">
         <h2>Products</h2>
         {products.map((product) => (

@@ -5,6 +5,7 @@ import { updateProduct } from "../slice/productSlice";
 import axios from "axios";
 import NavBar from "../components/common/NavBar";
 import Footer from "../components/common/Footer";
+import { getCart } from "../slice/cartSlice";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 
@@ -29,6 +30,10 @@ const MainLayout = () => {
         console.error("Get Product Failed", axiosError || err);
       }
     })();
+  }, []);
+
+  useEffect(() => {
+    dispatch(getCart());
   }, []);
 
   return (
