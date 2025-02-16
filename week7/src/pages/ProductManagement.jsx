@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import ProductModal from "@/components/admin/ProductModal";
 import Paginator from "@/components/common/Paginator";
+import { useDispatch } from "react-redux";
+import { notify } from "@/slice/notificationSlice";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 
@@ -27,6 +29,7 @@ const ProductManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const modalRef = useRef(null);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     getProducts();
@@ -43,12 +46,17 @@ const ProductManagement = () => {
   }
 
   async function handleDeleteProduct(id) {
+    const msg = {type: 'success', msg: 'Product deleted'}
     try {
       if (!confirm("Are you sure you want to delete this product")) return;
       await axios.delete(`${API_BASE}/api/${API_PATH}/admin/product/${id}`);
       getProducts();
     } catch (err) {
       console.error("Delete Failed", err);
+      msg.type = "fail"
+      msg.msg = "Product delete failed"
+    } finally {
+      dispatch(notify(msg))
     }
   }
 

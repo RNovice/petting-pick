@@ -5,7 +5,9 @@ import {
   useImperativeHandle,
   Fragment,
 } from "react";
+import { useDispatch } from "react-redux";
 import axios from "axios";
+import { notify } from "@/slice/notificationSlice";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 
@@ -13,6 +15,7 @@ const ProductModal = forwardRef(
   ({ modalData, setModalData, isEditMode, getProducts }, ref) => {
     const modalRef = useRef(null);
     const [uploadingId, setUploadingId] = useState(null);
+    const dispatch = useDispatch();
 
     useImperativeHandle(ref, () => ({
       showModal: () => modalRef.current?.showModal(),
@@ -61,7 +64,10 @@ const ProductModal = forwardRef(
           price: +modalData.price,
         },
       };
-
+      const msg = {
+        type: "success",
+        msg: `Product ${id ? "updated" : "added"}`,
+      };
       try {
         id
           ? await axios.put(url, productData)
@@ -70,9 +76,13 @@ const ProductModal = forwardRef(
         getProducts();
         modalRef.current?.close();
       } catch (err) {
+        msg.type = "fail";
         const axiosError = err.response?.data.message;
-        console.error(`${id ? "Update" : "Add"} Failed`, axiosError || err);
-        axiosError && alert(axiosError.join`\n`);
+        const errorMsg = `Product ${id ? "update" : "add"} failed`
+        console.error(errorMsg, axiosError || err);
+        msg.msg = errorMsg;
+      } finally {
+        dispatch(notify(msg));
       }
     }
 

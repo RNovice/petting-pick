@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
+const CART_API = `${API_BASE}/api/${API_PATH}/cart`;
 
 export const getCart = createAsyncThunk(
   "cart/getCart",
@@ -11,7 +12,7 @@ export const getCart = createAsyncThunk(
         data: {
           data: { carts, final_total },
         },
-      } = await axios(`${API_BASE}/api/${API_PATH}/cart`);
+      } = await axios(CART_API);
       return { carts, final_total };
     } catch (err) {
       return rejectWithValue(err.response?.data || "Get cart failed");
@@ -22,7 +23,7 @@ export const getCart = createAsyncThunk(
 export const removeCartItem = createAsyncThunk("cart/removeCartItem", async (id = null, { rejectWithValue, dispatch }) => {
   try {
     await axios.delete(
-      `${API_BASE}/api/${API_PATH}/cart${id === null ? "s" : `/${id}`}`
+      `${CART_API}${id === null ? "s" : `/${id}`}`
     );
     dispatch(getCart());
   } catch (err) {
@@ -32,7 +33,7 @@ export const removeCartItem = createAsyncThunk("cart/removeCartItem", async (id 
 
 export const updateCartItem = createAsyncThunk("cart/updateCartItem", async ({ product_id, qty }, { rejectWithValue, dispatch }) => {
   try {
-    const url = `${API_BASE}/api/${API_PATH}/cart/${product_id}`;
+    const url = `${CART_API}/${product_id}`;
     qty > 0
       ? await axios.put(url, { data: { product_id, qty } })
       : await axios.delete(url);
@@ -42,9 +43,9 @@ export const updateCartItem = createAsyncThunk("cart/updateCartItem", async ({ p
   }
 });
 
-export const addCartItem = createAsyncThunk("cart/addCartItem", async ( product_id, { rejectWithValue, dispatch }) => {
+export const addCartItem = createAsyncThunk("cart/addCartItem", async (product_id, { rejectWithValue, dispatch }) => {
   try {
-    await axios.post(`${API_BASE}/api/${API_PATH}/cart`, {
+    await axios.post(CART_API, {
       data: { product_id, qty: 1 },
     });
     dispatch(getCart());
