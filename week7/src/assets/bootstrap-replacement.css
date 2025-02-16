@@ -33,6 +33,6 @@
 }
 
 .modal-env *::-webkit-scrollbar-thumb {
-  background: #e66536;
+  background: #333;
   border-radius: 10px;
 }

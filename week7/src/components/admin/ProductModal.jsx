@@ -78,7 +78,7 @@ const ProductModal = forwardRef(
       } catch (err) {
         msg.type = "fail";
         const axiosError = err.response?.data.message;
-        const errorMsg = `Product ${id ? "update" : "add"} failed`
+        const errorMsg = `Product ${id ? "update" : "add"} failed`;
         console.error(errorMsg, axiosError || err);
         msg.msg = errorMsg;
       } finally {

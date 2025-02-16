@@ -3,6 +3,7 @@ import axios from "axios";
 import ProductModal from "@/components/admin/ProductModal";
 import Paginator from "@/components/common/Paginator";
 import { useDispatch } from "react-redux";
+import { startLoading, stopLoading } from "@/slice/loadingSlice";
 import { notify } from "@/slice/notificationSlice";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
@@ -46,22 +47,27 @@ const ProductManagement = () => {
   }
 
   async function handleDeleteProduct(id) {
-    const msg = {type: 'success', msg: 'Product deleted'}
+    const msg = { type: "success", msg: "Product deleted" };
     try {
-      if (!confirm("Are you sure you want to delete this product")) return;
+      if (!confirm("Are you sure you want to delete this product")) {
+        msg.type = "info";
+        msg.msg = "Action cancelled";
+        return;
+      }
       await axios.delete(`${API_BASE}/api/${API_PATH}/admin/product/${id}`);
       getProducts();
     } catch (err) {
       console.error("Delete Failed", err);
-      msg.type = "fail"
-      msg.msg = "Product delete failed"
+      msg.type = "fail";
+      msg.msg = "Product delete failed";
     } finally {
-      dispatch(notify(msg))
+      dispatch(notify(msg));
     }
   }
 
   async function getProducts(page = null) {
     try {
+      dispatch(startLoading());
       const {
         data: { products, pagination },
       } = await axios.get(
@@ -74,6 +80,8 @@ const ProductManagement = () => {
       setProducts(products);
     } catch (err) {
       console.error(err);
+    } finally {
+      dispatch(stopLoading());
     }
   }
 
