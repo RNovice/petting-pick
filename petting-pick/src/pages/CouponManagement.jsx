@@ -16,7 +16,7 @@ const emptyModalData = () => ({
   code: "",
 });
 
-const countdown = (targetDate)=> {
+const countdown = (targetDate) => {
   const now = new Date();
   const target = new Date(targetDate);
   const diff = Math.floor((target - now) / (1000 * 60 * 60 * 24));
@@ -24,7 +24,7 @@ const countdown = (targetDate)=> {
   if (diff > 0) return `${diff} Days`;
   if (diff === 0) return "Today";
   return "Expired";
-}
+};
 
 const CouponManagement = () => {
   const [coupons, setCoupons] = useState([]);
@@ -37,6 +37,8 @@ const CouponManagement = () => {
 
   useEffect(() => {
     getCoupons();
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleModalOperation(isEditMethod, coupon = emptyModalData()) {
@@ -83,7 +85,9 @@ const CouponManagement = () => {
       setCoupons(
         coupons.map((coupon) => ({
           ...coupon,
-          due_date: new Date(coupon.due_date * 1000).toISOString().split('T')[0],
+          due_date: new Date(coupon.due_date * 1000)
+            .toISOString()
+            .split("T")[0],
         }))
       );
     } catch (err) {
@@ -123,7 +127,9 @@ const CouponManagement = () => {
           {coupons.map((coupon, index) => (
             <tr key={index}>
               <td>{coupon.title}</td>
-              <td>{coupon.due_date} ({countdown(coupon.due_date)})</td>
+              <td>
+                {coupon.due_date} ({countdown(coupon.due_date)})
+              </td>
               <td>{coupon.code}</td>
               <td>{coupon.percent}</td>
               <td>{coupon.is_enabled ? "Yes" : "No"}</td>

@@ -32,6 +32,8 @@ const OrderManagement = () => {
 
   useEffect(() => {
     getOrders();
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleModalOperation(order = emptyModalData()) {

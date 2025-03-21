@@ -414,4 +414,6 @@ const ProductModal = forwardRef(
   }
 );
 
+ProductModal.displayName = "ProductModal"
+
 export default ProductModal;

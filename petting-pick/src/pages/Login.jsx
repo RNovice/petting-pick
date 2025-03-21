@@ -27,7 +27,7 @@ const Login = () => {
     return () => {
       dispatch(stopLoading());
     };
-  }, [status]);
+  }, [status, dispatch]);
 
   function handleInput(e) {
     const { name, value } = e.target;

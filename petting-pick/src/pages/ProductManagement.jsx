@@ -34,6 +34,8 @@ const ProductManagement = () => {
 
   useEffect(() => {
     getProducts();
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleModalOperation(isEditMethod, product = emptyModalData()) {

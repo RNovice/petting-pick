@@ -42,6 +42,8 @@ const Products = () => {
 
   useEffect(() => {
     getProducts();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
   async function handleAddToCart(id) {

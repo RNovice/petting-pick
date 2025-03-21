@@ -1,10 +1,4 @@
-import {
-  useState,
-  forwardRef,
-  useRef,
-  useImperativeHandle,
-  Fragment,
-} from "react";
+import { forwardRef, useRef, useImperativeHandle } from "react";
 import { useDispatch } from "react-redux";
 import axios from "axios";
 import { notify } from "@/slice/notificationSlice";
@@ -63,10 +57,9 @@ const ProductModal = forwardRef(
         msg: `Order updated`,
       };
       try {
-        await axios.put(
-          `${API_BASE}/api/${API_PATH}/admin/order/${id}`,
-          { data: modalData }
-        );
+        await axios.put(`${API_BASE}/api/${API_PATH}/admin/order/${id}`, {
+          data: modalData,
+        });
         getOrders();
         modalRef.current?.close();
       } catch (err) {
@@ -226,5 +219,7 @@ const ProductModal = forwardRef(
     );
   }
 );
+
+ProductModal.displayName = "ProductModal"
 
 export default ProductModal;

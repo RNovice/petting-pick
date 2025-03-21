@@ -22,7 +22,7 @@ const CustomersSay = () => {
           {testimonials.map(({ text, author }, index) => (
             <div key={`customers-say-${index}`} className="col-md-4">
               <div className="card p-3 shadow-sm">
-                <p>"{text}"</p>
+                <p>&quot;{text}&quot;</p>
                 <strong>- {author}</strong>
               </div>
             </div>

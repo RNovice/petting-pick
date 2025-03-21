@@ -29,6 +29,7 @@ export const checkLogin = createAsyncThunk("auth/checkLogin", async (_, { reject
     await axios.post(`${API_BASE}/api/user/check`);
     return { token };
   } catch (err) {
+    console.error(err)
     document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     return rejectWithValue("Not authenticated");
   }
@@ -42,7 +43,7 @@ export const logoutAdmin = createAsyncThunk("auth/logoutAdmin", async (_, { reje
       document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     }
   } catch (err) {
-    return rejectWithValue(error.response?.data || "Logout failed");
+    return rejectWithValue(err.response?.data || "Logout failed");
   }
 });
 

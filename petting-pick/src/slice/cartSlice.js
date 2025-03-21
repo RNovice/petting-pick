@@ -29,6 +29,7 @@ export const removeCartItem = createAsyncThunk("cart/removeCartItem", async (id 
     );
     dispatch(getCart());
   } catch (err) {
+    console.error(err)
     return rejectWithValue("Cart item removed failed");
   }
 });
@@ -41,6 +42,7 @@ export const updateCartItem = createAsyncThunk("cart/updateCartItem", async ({ p
       : await axios.delete(url);
     dispatch(getCart());
   } catch (err) {
+    console.error(err)
     return rejectWithValue("Cart item updated failed");
   }
 });
@@ -52,6 +54,7 @@ export const addCartItem = createAsyncThunk("cart/addCartItem", async (product_i
     });
     dispatch(getCart());
   } catch (err) {
+    console.error(err)
     return rejectWithValue("Cart item updated failed");
   }
 });

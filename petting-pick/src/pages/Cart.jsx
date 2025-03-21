@@ -92,12 +92,10 @@ const Cart = () => {
   const submitOrder = async (user) => {
     try {
       dispatch(startLoading());
-      if (cart.length === 0)
-        return setNotifications({
-          msg: "Shopping Cart is Empty",
-          type: "warning",
-          key: Date.now(),
-        });
+      if (cart.length === 0) {
+        dispatch(notify({ type: "fail", msg: "Shopping Cart is Empty" }));
+        return;
+      }
       const message = user.message;
       const { data } = await axios.post(`${API_BASE}/api/${API_PATH}/order`, {
         data: { user, message },

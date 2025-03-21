@@ -190,4 +190,6 @@ const CouponModal = forwardRef(
   }
 );
 
+CouponModal.displayName = "CouponModal"
+
 export default CouponModal;

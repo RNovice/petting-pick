@@ -37,11 +37,11 @@ const MainLayout = () => {
         console.error("Get Product Failed", axiosError || err);
       }
     })();
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     dispatch(getCart());
-  }, []);
+  }, [dispatch]);
 
   return (
     <div>
