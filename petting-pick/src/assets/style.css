@@ -47,6 +47,26 @@ hr {
   }
 }
 
+@keyframes growWidth {
+  from {
+    max-width: 0;
+  }
+  to {
+    max-width: 300px;
+  }
+}
+
+.filter-tag {
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.filter-tag.active {
+  margin-left: 12px;
+  animation: growWidth 1s ease-in-out forwards;
+}
+
 .aside-cart {
   top: 0;
   height: 100vh;

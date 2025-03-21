@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import axios from "axios";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
 import { addCartItem } from "@/slice/cartSlice";
 import ratingSvg from "@/assets/images/rating.svg";
 import AsideCart from "./AsideCart";
+import ProductCard from "./productCard";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 
@@ -14,6 +15,7 @@ const ProductDetail = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const [productData, setProducts] = useState(location.state || {});
+  const [related, setRelated] = useState([]);
   const [notifications, setNotifications] = useState({
     msg: null,
     type: "",
@@ -21,7 +23,7 @@ const ProductDetail = () => {
   });
 
   useEffect(() => {
-    if (!productData.id) {
+    if (!productData?.id) {
       (async () => {
         try {
           const res = await axios.get(
@@ -33,8 +35,24 @@ const ProductDetail = () => {
           console.error("Get Cart Failed", axiosError || err);
         }
       })();
+    } else {
+      setProducts(location.state);
     }
-  }, []);
+  }, [id]);
+
+  useEffect(() => {
+    const category = productData?.category;
+    if (!category) {
+      setRelated([]);
+      return;
+    }
+    (async () => {
+      const { data } = await axios.get(
+        `${API_BASE}/api/${API_PATH}/products?category=${category}`
+      );
+      setRelated(data.products.filter(({ id: pid }) => id !== pid).slice(0, 3));
+    })();
+  }, [productData?.category, id]);
 
   async function handleAddToCart(id) {
     try {
@@ -55,8 +73,8 @@ const ProductDetail = () => {
 
   return (
     <div className="container my-5">
-    <AsideCart notifications={notifications} />
-      <div className="row">
+      <AsideCart notifications={notifications} />
+      <div className="row mb-4">
         <div className="col-md-6">
           <div className="ratio ratio-4x3">
             <img
@@ -106,8 +124,7 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
-
-      <div className="row mt-4">
+      <div className="row mb-5">
         {productData.imagesUrl?.map((url, i) => (
           <div className="col-md-4" key={`product-image-${i}`}>
             {url && (
@@ -123,6 +140,16 @@ const ProductDetail = () => {
           </div>
         ))}
       </div>
+      {related.length > 0 && (
+        <div className="row pt-2">
+          <h3 className="mb-4">Products related to this item</h3>
+          {related.map((item, i) => (
+            <div className="col-md-4" key={`related-product-${i}`}>
+              <ProductCard product={item} handleAddToCart={handleAddToCart} />
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

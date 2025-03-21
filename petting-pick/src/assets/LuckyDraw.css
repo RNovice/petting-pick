@@ -52,7 +52,13 @@
 
 .winner {
   padding: 8px;
-  background-color: gold;
+  background-color: black;
+  color: gold;
+  border-color: gold;
+}
+
+.winner h4 {
+  color: gold;
 }
 
 .winner span {

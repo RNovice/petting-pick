@@ -1,7 +1,14 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import LogoSvg from "@/assets/images/logo.svg";
+import { useEffect } from "react";
 
 function Navbar({ navItems = [] }) {
+  const location = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [location.pathname]);
+
   return (
     <>
       <nav className="navbar navbar-expand-sm navbar-light bg-light p-2 position-sticky top-0 z-1 w-100">

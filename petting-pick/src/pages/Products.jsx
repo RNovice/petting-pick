@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
@@ -6,12 +6,30 @@ import { addCartItem } from "@/slice/cartSlice";
 import { updateProduct } from "@/slice/productSlice";
 import Paginator from "../components/common/Paginator";
 import AsideCart from "../components/product/AsideCart";
-import { useNavigate } from "react-router-dom";
+import ProductCard from "../components/product/productCard";
+const icons = import.meta.glob("@/assets/images/categories/*.svg", {
+  eager: true,
+});
+const iconsObj = Object.keys(icons).reduce((acc, path) => {
+  const fileName = path.split("/").pop().replace(".svg", "");
+  acc[fileName] = icons[path].default;
+  return acc;
+}, {});
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 
+const categoriesText = ["Dog", "Small Animal", "Aquarium", "Cat", "Bird"];
+const categories = [
+  { text: "Dog", icon: iconsObj["dog"] },
+  { text: "Small Animal", icon: iconsObj["rabbit"] },
+  { text: "Aquarium", icon: iconsObj["fish"] },
+  { text: "Cat", icon: iconsObj["cat"] },
+  { text: "Bird", icon: iconsObj["bird"] },
+];
+
 const Products = () => {
   const products = useSelector((state) => state.products?.data);
+  const [filter, setFilter] = useState("All");
   const { total_pages: totalPages, current_page: currentPage } = useSelector(
     (state) => state.products?.pagination
   );
@@ -20,9 +38,11 @@ const Products = () => {
     type: "",
     key: 0,
   });
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    getProducts();
+  }, [filter]);
 
   async function handleAddToCart(id) {
     try {
@@ -37,16 +57,14 @@ const Products = () => {
     }
   }
 
-  function handleViewDetails(product) {
-    navigate(`/products/${product.id}`, { state: product });
-  }
-
-  const getProducts = async (page = null) => {
+  const getProducts = async (page = 1) => {
     try {
       const {
         data: { products, pagination },
       } = await axios(
-        `${API_BASE}/api/${API_PATH}/products${page ? `?page=${page}` : ""}`
+        `${API_BASE}/api/${API_PATH}/products?page=${page}${
+          categoriesText.includes(filter) ? `&category=${filter}` : ""
+        }`
       );
       dispatch(updateProduct({ data: products, pagination }));
     } catch (err) {
@@ -63,38 +81,47 @@ const Products = () => {
     <div className="container my-4">
       <AsideCart notifications={notifications} />
       <div className="row mb-5">
-        <h2>Products</h2>
+        <div className="mb-3 d-flex flex-wrap justify-content-between">
+          <h2>Products</h2>
+          <div className="d-flex ">
+            <div
+              className={`btn btn-sm btn${
+                filter === "All" ? "" : "-outline"
+              }-primary rounded-pill me-2 d-flex align-items-center`}
+              onClick={() => setFilter("All")}
+            >
+              All
+            </div>
+            {categories.map(({ text, icon }, i) => (
+              <div
+                className={`btn btn-sm btn${
+                  filter === text ? "" : "-outline"
+                }-primary rounded-pill me-2 d-flex align-items-center`}
+                key={`category-filter-tag-${i}`}
+                onClick={() => setFilter(text)}
+                title={text}
+              >
+                <i
+                  className="icon"
+                  style={{
+                    backgroundColor: "currentcolor",
+                    maskImage: `url("${icon}")`,
+                    width: 24,
+                    height: 24,
+                  }}
+                />
+                <span
+                  className={`filter-tag ${filter === text ? "active" : ""}`}
+                >
+                  {text}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
         {products.map((product) => (
           <div className="col-md-4 mb-3" key={`shop-product-${product.id}`}>
-            <div className="card h-100">
-              <div className="ratio ratio-4x3">
-                <img
-                  src={product.imageUrl}
-                  className="card-img-top"
-                  alt={product.title}
-                  style={{ objectFit: "cover", objectPosition: "center" }}
-                />
-              </div>
-              <div className="card-body">
-                <h5 className="card-title">{product.title}</h5>
-                <small>
-                  <s>${product.origin_price}</s>
-                </small>
-                <p className="card-text">${product.price}</p>
-                <button
-                  className="btn btn-primary me-2"
-                  onClick={() => handleAddToCart(product.id)}
-                >
-                  Add to Cart
-                </button>
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => handleViewDetails(product)}
-                >
-                  More Details
-                </button>
-              </div>
-            </div>
+            <ProductCard product={product} handleAddToCart={handleAddToCart} />
           </div>
         ))}
         {totalPages > 1 && (
