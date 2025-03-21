@@ -83,11 +83,11 @@ const Products = () => {
       <div className="row mb-5">
         <div className="mb-3 d-flex flex-wrap justify-content-between">
           <h2>Products</h2>
-          <div className="d-flex ">
+          <div className="d-flex flex-wrap gap-2">
             <div
               className={`btn btn-sm btn${
                 filter === "All" ? "" : "-outline"
-              }-primary rounded-pill me-2 d-flex align-items-center`}
+              }-primary rounded-pill d-flex align-items-center`}
               onClick={() => setFilter("All")}
             >
               All
@@ -96,7 +96,7 @@ const Products = () => {
               <div
                 className={`btn btn-sm btn${
                   filter === text ? "" : "-outline"
-                }-primary rounded-pill me-2 d-flex align-items-center`}
+                }-primary rounded-pill d-flex align-items-center`}
                 key={`category-filter-tag-${i}`}
                 onClick={() => setFilter(text)}
                 title={text}

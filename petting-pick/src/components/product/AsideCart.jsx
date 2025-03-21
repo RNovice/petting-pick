@@ -34,7 +34,7 @@ const AsideCart = ({ notifications }) => {
   return (
     <>
       <button
-        className="btn position-fixed top-0 end-0 m-3 p-0 z-1"
+        className="btn aside-cart-btn position-fixed top-0 end-0 m-3 p-0 z-1"
         onClick={() => cartRef.current?.showModal()}
         type="button"
       >

@@ -68,6 +68,12 @@ hr {
   animation: growWidth 1s ease-in-out forwards;
 }
 
+@media(max-width: 768px) {
+  .aside-cart-btn {
+    display: none;
+  }
+}
+
 .aside-cart {
   top: 0;
   height: 100vh;

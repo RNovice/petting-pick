@@ -17,24 +17,28 @@ const ProductCard = ({ product, handleAddToCart }) => {
           style={{ objectFit: "cover", objectPosition: "center" }}
         />
       </div>
-      <div className="card-body">
+      <div className="card-body d-flex flex-column gap-3">
+        <div>
         <h5 className="card-title">{product.title}</h5>
         <small>
           <s>${product.origin_price}</s>
         </small>
         <p className="card-text">${product.price}</p>
-        <button
-          className="btn btn-primary me-2"
-          onClick={() => handleAddToCart(product.id)}
-        >
-          Add to Cart
-        </button>
-        <button
-          className="btn btn-secondary"
-          onClick={() => handleViewDetails(product)}
-        >
-          More Details
-        </button>
+        </div>
+        <div className="d-flex flex-wrap justify-content-between mt-auto">
+          <button
+            className="btn btn-primary me-2"
+            onClick={() => handleAddToCart(product.id)}
+          >
+            Add to Cart
+          </button>
+          <button
+            className="btn btn-secondary"
+            onClick={() => handleViewDetails(product)}
+          >
+            More Details
+          </button>
+        </div>
       </div>
     </div>
   );
