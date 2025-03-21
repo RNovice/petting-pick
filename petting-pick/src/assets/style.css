@@ -51,6 +51,7 @@ hr {
   from {
     max-width: 0;
   }
+
   to {
     max-width: 300px;
   }
@@ -151,6 +152,24 @@ hr {
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+.order-result {
+  inset: 0;
+  background-color: #0005;
+  backdrop-filter: blur(1px);
+}
+
+.order-result h3 {
+  letter-spacing: 5px;
+}
+
+.order-result .result-modal {
+  background-color: white;
+  border-radius: 1rem;
+  max-width: 80%;
+  min-width: 20rem;
+  padding: 1.75rem;
 }
 
 .toast {

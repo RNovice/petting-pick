@@ -7,6 +7,7 @@ import { getCart, updateCartItem, removeCartItem } from "@/slice/cartSlice";
 import trashCanSvg from "@/assets/images/trash-can.svg";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import OrderResult from "../components/order/OrderResult";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 
@@ -20,6 +21,7 @@ const Cart = () => {
   } = useForm();
   const dispatch = useDispatch();
   const [coupon, setCoupon] = useState("");
+  const [result, setResult] = useState({});
 
   useEffect(() => {
     const handleWheel = (event) => {
@@ -97,12 +99,12 @@ const Cart = () => {
           key: Date.now(),
         });
       const message = user.message;
-      await axios.post(`${API_BASE}/api/${API_PATH}/order`, {
+      const { data } = await axios.post(`${API_BASE}/api/${API_PATH}/order`, {
         data: { user, message },
       });
       reset();
       await dispatch(getCart());
-      alert("Order successfully");
+      setResult(data);
     } catch (err) {
       const axiosError = err.response?.data?.message;
       console.error("Get Product Failed", axiosError || err);
@@ -293,6 +295,7 @@ const Cart = () => {
           </button>
         </form>
       </div>
+      <OrderResult result={result} />
     </div>
   );
 };
