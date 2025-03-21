@@ -4,7 +4,7 @@ import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
 import { addCartItem } from "@/slice/cartSlice";
-import ratingSvg from "@/assets/rating.svg";
+import ratingSvg from "@/assets/images/rating.svg";
 import AsideCart from "./AsideCart";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;

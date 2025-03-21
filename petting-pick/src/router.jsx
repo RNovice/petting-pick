@@ -11,6 +11,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import ProductManagement from "./pages/ProductManagement";
 import ProductDetail from "./components/product/ProductDetail";
 import OrderManagement from "./pages/OrderManagement";
+import CouponManagement from "./pages/CouponManagement";
 
 const createRouter =
   process.env.NODE_ENV === "production"
@@ -55,6 +56,7 @@ export default createRouter([
       },
       { path: "products", element: <ProductManagement /> },
       { path: "orders", element: <OrderManagement /> },
+      { path: "coupons", element: <CouponManagement /> },
     ],
   },
   {

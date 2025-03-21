@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import LogoSvg from "@/assets/logo.svg";
+import LogoSvg from "@/assets/images/logo.svg";
 
 const NotFound = () => {
   const navigate = useNavigate();

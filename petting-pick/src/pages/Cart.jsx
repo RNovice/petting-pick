@@ -1,13 +1,17 @@
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
+import { notify } from "@/slice/notificationSlice";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
 import { getCart, updateCartItem, removeCartItem } from "@/slice/cartSlice";
+import trashCanSvg from "@/assets/images/trash-can.svg";
 import axios from "axios";
+import { Link } from "react-router-dom";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 
 const Cart = () => {
-  const { cart, cartTotal } = useSelector((state) => state.cart);
+  const { cart, cartTotal, cartOrigin } = useSelector((state) => state.cart);
   const {
     register,
     handleSubmit,
@@ -15,6 +19,22 @@ const Cart = () => {
     formState: { errors },
   } = useForm();
   const dispatch = useDispatch();
+  const [coupon, setCoupon] = useState("");
+
+  useEffect(() => {
+    const handleWheel = (event) => {
+      if (document.activeElement.type === "number") {
+        event.preventDefault();
+        event.target.blur();
+      }
+    };
+
+    document.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      document.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
 
   async function handleCartItemUpdate(product_id, qty) {
     try {
@@ -29,6 +49,39 @@ const Cart = () => {
     try {
       dispatch(startLoading());
       await dispatch(removeCartItem(id));
+    } finally {
+      dispatch(stopLoading());
+    }
+  }
+
+  async function handleApplyCoupon() {
+    const msg = { type: "success", msg: "Coupon applied" };
+    try {
+      dispatch(startLoading());
+      await axios.post(`${API_BASE}/api/${API_PATH}/coupon`, {
+        data: { code: coupon },
+      });
+      await dispatch(getCart());
+    } catch (err) {
+      const errMsg = err?.response?.data?.message || "";
+      msg.type = "fail";
+      msg.msg = errMsg.includes("無法")
+        ? "Coupon expired or disabled"
+        : "Coupon not found";
+    } finally {
+      dispatch(stopLoading());
+      dispatch(notify(msg));
+    }
+  }
+
+  async function handleRemoveCoupon() {
+    if (!confirm("Are you sure you want to cancel the discount")) return;
+    try {
+      dispatch(startLoading());
+      await axios.post(`${API_BASE}/api/${API_PATH}/coupon`, {
+        data: { code: "remove" },
+      });
+      await dispatch(getCart());
     } finally {
       dispatch(stopLoading());
     }
@@ -74,7 +127,7 @@ const Cart = () => {
           )}
         </h2>
         {cart.length > 0 ? (
-          <table className="table table-bordered">
+          <table className="table table-sm table-bordered">
             <thead>
               <tr>
                 <th>Preview</th>
@@ -122,9 +175,49 @@ const Cart = () => {
             </tbody>
           </table>
         ) : (
-          <p className="fs-5 text-danger">No items in the cart.</p>
+          <div className="mb-3 fs-5 d-flex gap-2">
+            <span className="text-danger">No items in the cart.</span>
+            <Link className="text-primary" to="/products">
+              Get Some Goods
+            </Link>
+          </div>
         )}
         <h4>Total: ${cartTotal}</h4>
+      </div>
+      <div className="mb-5">
+        <h2>Coupon</h2>
+        <div className="mb-3 d-flex gap-3">
+          <input
+            type="text"
+            className="form-control"
+            value={coupon}
+            onChange={({ target }) => setCoupon(target.value)}
+          />
+          <button
+            className="btn btn-primary"
+            type="button"
+            disabled={!coupon}
+            onClick={handleApplyCoupon}
+          >
+            APPLY
+          </button>
+        </div>
+        {cartOrigin !== cartTotal && (
+          <div className="mb-3 d-flex gap-2">
+            Coupon Applying ${cartOrigin} become ${cartTotal}
+            <i
+              className="icon bg-danger"
+              title="remove coupon"
+              onClick={handleRemoveCoupon}
+              style={{
+                maskImage: `url("${trashCanSvg}")`,
+                width: 20,
+                height: 20,
+                cursor: "pointer",
+              }}
+            />
+          </div>
+        )}
       </div>
       <div className="mb-5">
         <h2>Customer Information</h2>

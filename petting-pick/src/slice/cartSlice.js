@@ -3,6 +3,8 @@ import axios from "axios";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 const CART_API = `${API_BASE}/api/${API_PATH}/cart`;
+const fixNum = (num) => Math.round(num * 1000) / 1000
+
 
 export const getCart = createAsyncThunk(
   "cart/getCart",
@@ -10,10 +12,10 @@ export const getCart = createAsyncThunk(
     try {
       const {
         data: {
-          data: { carts, final_total },
+          data: { carts, total, final_total },
         },
       } = await axios(CART_API);
-      return { carts, final_total };
+      return { carts, total, final_total };
     } catch (err) {
       return rejectWithValue(err.response?.data || "Get cart failed");
     }
@@ -56,12 +58,13 @@ export const addCartItem = createAsyncThunk("cart/addCartItem", async (product_i
 
 const cartSlice = createSlice({
   name: "cart",
-  initialState: { cart: [], cartTotal: 0 },
+  initialState: { cart: [], cartTotal: 0, cartOrigin: 0 },
   extraReducers: (builder) => {
     builder
       .addCase(getCart.fulfilled, (state, { payload }) => {
-        state.cart = payload.carts;
-        state.cartTotal = payload.final_total;
+        state.cart = payload.carts.map(item => ({ ...item, final_total: fixNum(item.final_total) }));
+        state.cartTotal = fixNum(payload.final_total);
+        state.cartOrigin = fixNum(payload.total);
       })
   },
 });

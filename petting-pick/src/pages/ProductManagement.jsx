@@ -100,7 +100,7 @@ const ProductManagement = () => {
           Add New Product
         </button>
       </div>
-      <table className="table table-bordered">
+      <table className="table table-sm table-bordered">
         <thead>
           <tr>
             <th>Category</th>

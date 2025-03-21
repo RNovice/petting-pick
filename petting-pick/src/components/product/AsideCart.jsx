@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { updateCartItem, removeCartItem } from "@/slice/cartSlice";
 import ReactLoading from "react-loading";
-import shoppingCartSvg from "@/assets/shopping-cart.svg";
-import trashCanSvg from "@/assets/trash-can.svg";
+import shoppingCartSvg from "@/assets/images/shopping-cart.svg";
+import trashCanSvg from "@/assets/images/trash-can.svg";
 
 const AsideCart = ({ notifications }) => {
   const { cart, cartTotal } = useSelector((state) => state.cart);

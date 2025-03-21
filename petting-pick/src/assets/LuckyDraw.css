@@ -1,0 +1,140 @@
+.lottery-wheel {
+  display: grid;
+  grid-template-columns: repeat(3, 168px);
+  grid-template-rows: repeat(3, 168px);
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+}
+
+.lottery-cell {
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: 100%;
+  font-size: 16px;
+  font-weight: bold;
+  border: 2px solid #ccc;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.6s ease-in-out;
+}
+
+.center {
+  font-weight: bold;
+}
+
+.spin-button {
+  color: white;
+  width: 100%;
+  height: 100%;
+  font-size: 1.5rem;
+  font-weight: bolder;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.spin-button:disabled {
+  cursor: not-allowed;
+}
+
+.prize-emoji {
+  font-size: 2.5rem;
+}
+
+.winner {
+  padding: 8px;
+  background-color: gold;
+}
+
+.winner span {
+  user-select: all;
+}
+
+.winner * {
+  font-size: 66%;
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.win-item-0 {
+  transform: scale(3.3) translate(33%, 33%);
+}
+
+.win-item-1 {
+  transform: scale(3.3) translate(0%, 33%);
+}
+
+.win-item-2 {
+  transform: scale(3.3) translate(-33%, 33%);
+}
+
+.win-item-3 {
+  transform: scale(3.3) translate(33%, 0%);
+}
+
+.win-item-5 {
+  transform: scale(3.3) translate(-33%, 0%);
+}
+
+.win-item-6 {
+  transform: scale(3.3) translate(33%, -33%);
+}
+
+.win-item-7 {
+  transform: scale(3.3) translate(0%, -33%);
+}
+
+.win-item-8 {
+  transform: scale(3.3) translate(-33%, -33%);
+}
+
+.lottery-wheel.spinning .lottery-cell {
+  animation: drawing 1s infinite;
+}
+
+.lottery-wheel.spinning .lottery-item-1 {
+  animation-delay: 0.5s;
+}
+
+@keyframes drawing {
+
+  0%,
+  50% {
+    background-color: transparent;
+  }
+
+  51%,
+  100% {
+    background-color: gold;
+  }
+}
+
+@media (max-width: 768px) {
+  .lottery-wheel {
+    display: grid;
+    grid-template-columns: repeat(3, 96px);
+    grid-template-rows: repeat(3, 96px);
+    gap: 4px;
+  }
+
+  .lottery-cell {
+    font-size: 0.7rem;
+  }
+
+  .spin-button {
+    font-size: 0.8rem;
+  }
+
+  .prize-emoji {
+    font-size: 1.2rem;
+  }
+}

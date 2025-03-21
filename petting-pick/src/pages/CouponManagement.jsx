@@ -1,83 +1,91 @@
 import { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import OrderModal from "@/components/admin/OrderModal";
 import Paginator from "@/components/common/Paginator";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
 import { notify } from "@/slice/notificationSlice";
+import CouponModal from "../components/admin/CouponModal";
 
 const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 
-const emptyModalData = () => ({ 
-    create_at: 0,
-    is_paid: false,
-    message: "",
-    products: {
-    },
-    user: {
-      address: "",
-      email: "",
-      name: "",
-      tel: ""
-    },
+const emptyModalData = () => ({
+  title: "",
+  is_enabled: 0,
+  percent: 100,
+  due_date: "",
+  code: "",
 });
 
-const OrderManagement = () => {
-  const [orders, setOrders] = useState([]);
+const countdown = (targetDate)=> {
+  const now = new Date();
+  const target = new Date(targetDate);
+  const diff = Math.floor((target - now) / (1000 * 60 * 60 * 24));
+
+  if (diff > 0) return `${diff} Days`;
+  if (diff === 0) return "Today";
+  return "Expired";
+}
+
+const CouponManagement = () => {
+  const [coupons, setCoupons] = useState([]);
   const [modalData, setModalData] = useState(emptyModalData());
+  const [isEditMode, setIsEditMode] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const modalRef = useRef(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    getOrders();
+    getCoupons();
   }, []);
 
-  function handleModalOperation(order = emptyModalData()) {
+  function handleModalOperation(isEditMethod, coupon = emptyModalData()) {
+    setIsEditMode(isEditMethod);
     setModalData({
       ...emptyModalData(),
-      ...order
+      ...coupon,
+      is_enabled: coupon.is_enabled ?? 0,
     });
     modalRef.current?.showModal();
   }
 
-  async function handleDeleteOrder(id = null) {
-    const msg = { type: "success", msg: "Order deleted" };
+  async function handleDeleteCoupon(id) {
+    const msg = { type: "success", msg: "Coupon deleted" };
     try {
-      if (
-        !confirm(
-          `Are you sure you want to delete ${id ? "this order" : "all orders"}?`
-        )
-      ) {
+      if (!confirm("Are you sure you want to delete this coupon")) {
         msg.type = "info";
         msg.msg = "Action cancelled";
         return;
       }
-      await axios.delete(
-        `${API_BASE}/api/${API_PATH}/admin/order${id ? `/${id}` : `s/all`}`
-      );
-      getOrders();
+      await axios.delete(`${API_BASE}/api/${API_PATH}/admin/coupon/${id}`);
+      getCoupons();
     } catch (err) {
       console.error("Delete Failed", err);
       msg.type = "fail";
-      msg.msg = "Order delete failed";
+      msg.msg = "Coupon delete failed";
     } finally {
       dispatch(notify(msg));
     }
   }
 
-  async function getOrders(page = null) {
+  async function getCoupons(page = null) {
     try {
       dispatch(startLoading());
       const {
-        data: { orders, pagination },
+        data: { coupons, pagination },
       } = await axios.get(
-        `${API_BASE}/api/${API_PATH}/admin/orders${page ? `?page=${page}` : ""}`
+        `${API_BASE}/api/${API_PATH}/admin/coupons${
+          page ? `?page=${page}` : ""
+        }`
       );
       setCurrentPage(pagination.current_page);
       setTotalPages(pagination.total_pages);
-      setOrders(orders);
+      setCoupons(
+        coupons.map((coupon) => ({
+          ...coupon,
+          due_date: new Date(coupon.due_date * 1000).toISOString().split('T')[0],
+        }))
+      );
     } catch (err) {
       console.error(err);
     } finally {
@@ -87,45 +95,48 @@ const OrderManagement = () => {
 
   function onPageChange(page) {
     setCurrentPage(page);
-    getOrders(page);
+    getCoupons(page);
   }
 
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-end mb-4">
-        <button className="btn btn-primary" onClick={() => handleDeleteOrder()}>
-          Delete All Orders
+        <button
+          className="btn btn-primary"
+          onClick={() => handleModalOperation(false)}
+        >
+          Add New Coupon
         </button>
       </div>
       <table className="table table-sm table-bordered">
         <thead>
           <tr>
-            <th>User</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Address</th>
-            <th>Is Paid</th>
-            <th>Actions</th>
+            <th>Title</th>
+            <th>Due Date (Left Days)</th>
+            <th>Code</th>
+            <th>Percent</th>
+            <th>Is Enabled</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
-          {orders?.map((order, index) => (
+          {coupons.map((coupon, index) => (
             <tr key={index}>
-              <td>{order.user.name}</td>
-              <td>{order.user.email}</td>
-              <td>{order.user.tel}</td>
-              <td>{order.user.address}</td>
-              <td>{order.is_paid ? "Yes" : "No"}</td>
+              <td>{coupon.title}</td>
+              <td>{coupon.due_date} ({countdown(coupon.due_date)})</td>
+              <td>{coupon.code}</td>
+              <td>{coupon.percent}</td>
+              <td>{coupon.is_enabled ? "Yes" : "No"}</td>
               <td>
                 <button
                   className="btn btn-warning btn-sm me-2"
-                  onClick={() => handleModalOperation(order)}
+                  onClick={() => handleModalOperation(true, coupon)}
                 >
                   Edit
                 </button>
                 <button
                   className="btn btn-danger btn-sm"
-                  onClick={() => handleDeleteOrder(order.id)}
+                  onClick={() => handleDeleteCoupon(coupon.id)}
                 >
                   Delete
                 </button>
@@ -141,14 +152,15 @@ const OrderManagement = () => {
           onPageChange={onPageChange}
         />
       )}
-      <OrderModal
+      <CouponModal
         ref={modalRef}
         modalData={modalData}
         setModalData={setModalData}
-        getOrders={getOrders}
+        isEditMode={isEditMode}
+        getCoupons={getCoupons}
       />
     </div>
   );
 };
 
-export default OrderManagement;
+export default CouponManagement;

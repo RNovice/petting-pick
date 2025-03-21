@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import LogoSvg from "@/assets/logo.svg";
+import LogoSvg from "@/assets/images/logo.svg";
 
 function Navbar({ navItems = [] }) {
   return (

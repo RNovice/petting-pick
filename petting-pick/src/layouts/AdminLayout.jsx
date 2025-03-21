@@ -6,6 +6,7 @@ import NavBar from "../components/common/NavBar";
 const navItems = [
   { name: "MANAGE PRODUCTS", path: "/admin/products" },
   { name: "MANAGE ORDERS", path: "/admin/orders" },
+  { name: "MANAGE COUPONS", path: "/admin/coupons" },
 ];
 
 const AdminLayout = () => {
