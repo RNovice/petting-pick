@@ -1,2 +1,2 @@
 ## DEMO PAGE
-> https://rnovice.github.io/hex-2024-react/
+> https://rnovice.github.io/petting-pick/
