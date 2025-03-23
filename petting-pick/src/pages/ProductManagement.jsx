@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import ProductModal from "@/components/admin/ProductModal";
 import Paginator from "@/components/common/Paginator";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
 import { notify } from "@/slice/notificationSlice";
-
-const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
+import api from "../services/api";
 
 const emptyModalData = () => ({
   imageUrl: "",
@@ -34,7 +32,6 @@ const ProductManagement = () => {
 
   useEffect(() => {
     getProducts();
-    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -56,7 +53,7 @@ const ProductManagement = () => {
         msg.msg = "Action cancelled";
         return;
       }
-      await axios.delete(`${API_BASE}/api/${API_PATH}/admin/product/${id}`);
+      await api.delete(`admin/product/${id}`);
       getProducts();
     } catch (err) {
       console.error("Delete Failed", err);
@@ -72,11 +69,7 @@ const ProductManagement = () => {
       dispatch(startLoading());
       const {
         data: { products, pagination },
-      } = await axios.get(
-        `${API_BASE}/api/${API_PATH}/admin/products${
-          page ? `?page=${page}` : ""
-        }`
-      );
+      } = await api.get(`admin/products${page ? `?page=${page}` : ""}`);
       setCurrentPage(pagination.current_page);
       setTotalPages(pagination.total_pages);
       setProducts(products);

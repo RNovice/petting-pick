@@ -1,25 +1,22 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import OrderModal from "@/components/admin/OrderModal";
 import Paginator from "@/components/common/Paginator";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
 import { notify } from "@/slice/notificationSlice";
+import api from "../services/api";
 
-const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
-
-const emptyModalData = () => ({ 
-    create_at: 0,
-    is_paid: false,
-    message: "",
-    products: {
-    },
-    user: {
-      address: "",
-      email: "",
-      name: "",
-      tel: ""
-    },
+const emptyModalData = () => ({
+  create_at: 0,
+  is_paid: false,
+  message: "",
+  products: {},
+  user: {
+    address: "",
+    email: "",
+    name: "",
+    tel: "",
+  },
 });
 
 const OrderManagement = () => {
@@ -32,14 +29,13 @@ const OrderManagement = () => {
 
   useEffect(() => {
     getOrders();
-    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function handleModalOperation(order = emptyModalData()) {
     setModalData({
       ...emptyModalData(),
-      ...order
+      ...order,
     });
     modalRef.current?.showModal();
   }
@@ -56,9 +52,7 @@ const OrderManagement = () => {
         msg.msg = "Action cancelled";
         return;
       }
-      await axios.delete(
-        `${API_BASE}/api/${API_PATH}/admin/order${id ? `/${id}` : `s/all`}`
-      );
+      await api.delete(`admin/order${id ? `/${id}` : `s/all`}`);
       getOrders();
     } catch (err) {
       console.error("Delete Failed", err);
@@ -74,9 +68,7 @@ const OrderManagement = () => {
       dispatch(startLoading());
       const {
         data: { orders, pagination },
-      } = await axios.get(
-        `${API_BASE}/api/${API_PATH}/admin/orders${page ? `?page=${page}` : ""}`
-      );
+      } = await api.get(`admin/orders${page ? `?page=${page}` : ""}`);
       setCurrentPage(pagination.current_page);
       setTotalPages(pagination.total_pages);
       setOrders(orders);

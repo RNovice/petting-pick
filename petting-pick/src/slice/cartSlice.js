@@ -1,10 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../services/api";
 
-const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
-const CART_API = `${API_BASE}/api/${API_PATH}/cart`;
+const CART_API = "cart";
 const fixNum = (num) => Math.round(num * 1000) / 1000
-
 
 export const getCart = createAsyncThunk(
   "cart/getCart",
@@ -14,7 +12,7 @@ export const getCart = createAsyncThunk(
         data: {
           data: { carts, total, final_total },
         },
-      } = await axios(CART_API);
+      } = await api(CART_API);
       return { carts, total, final_total };
     } catch (err) {
       return rejectWithValue(err.response?.data || "Get cart failed");
@@ -24,7 +22,7 @@ export const getCart = createAsyncThunk(
 
 export const removeCartItem = createAsyncThunk("cart/removeCartItem", async (id = null, { rejectWithValue, dispatch }) => {
   try {
-    await axios.delete(
+    await api.delete(
       `${CART_API}${id === null ? "s" : `/${id}`}`
     );
     dispatch(getCart());
@@ -38,8 +36,8 @@ export const updateCartItem = createAsyncThunk("cart/updateCartItem", async ({ p
   try {
     const url = `${CART_API}/${product_id}`;
     qty > 0
-      ? await axios.put(url, { data: { product_id, qty } })
-      : await axios.delete(url);
+      ? await api.put(url, { data: { product_id, qty } })
+      : await api.delete(url);
     dispatch(getCart());
   } catch (err) {
     console.error(err)
@@ -49,7 +47,7 @@ export const updateCartItem = createAsyncThunk("cart/updateCartItem", async ({ p
 
 export const addCartItem = createAsyncThunk("cart/addCartItem", async (product_id, { rejectWithValue, dispatch }) => {
   try {
-    await axios.post(CART_API, {
+    await api.post(CART_API, {
       data: { product_id, qty: 1 },
     });
     dispatch(getCart());

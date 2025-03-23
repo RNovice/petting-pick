@@ -6,10 +6,8 @@ import {
   Fragment,
 } from "react";
 import { useDispatch } from "react-redux";
-import axios from "axios";
 import { notify } from "@/slice/notificationSlice";
-
-const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
+import api from "../../services/api";
 
 const ProductModal = forwardRef(
   ({ modalData, setModalData, isEditMode, getProducts }, ref) => {
@@ -55,7 +53,7 @@ const ProductModal = forwardRef(
     }
 
     async function handleSaveProduct(id = null) {
-      const url = `${API_BASE}/api/${API_PATH}/admin/product/${id ? id : ""}`;
+      const url = `admin/product/${id ? id : ""}`;
 
       const productData = {
         data: {
@@ -69,9 +67,7 @@ const ProductModal = forwardRef(
         msg: `Product ${id ? "updated" : "added"}`,
       };
       try {
-        id
-          ? await axios.put(url, productData)
-          : await axios.post(url, productData);
+        id ? await api.put(url, productData) : await api.post(url, productData);
 
         getProducts();
         modalRef.current?.close();
@@ -95,10 +91,7 @@ const ProductModal = forwardRef(
         formData.append("file-to-upload", file);
         const {
           data: { imageUrl },
-        } = await axios.post(
-          `${API_BASE}/api/${API_PATH}/admin/upload`,
-          formData
-        );
+        } = await api.post("admin/upload", formData);
         index === null
           ? setModalData({ ...modalData, imageUrl })
           : handleImagesInputChange(imageUrl, index);
@@ -414,6 +407,6 @@ const ProductModal = forwardRef(
   }
 );
 
-ProductModal.displayName = "ProductModal"
+ProductModal.displayName = "ProductModal";
 
 export default ProductModal;

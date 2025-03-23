@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import axios from "axios";
 import Paginator from "@/components/common/Paginator";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
 import { notify } from "@/slice/notificationSlice";
 import CouponModal from "../components/admin/CouponModal";
-
-const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
+import api from "../services/api";
 
 const emptyModalData = () => ({
   title: "",
@@ -37,7 +35,6 @@ const CouponManagement = () => {
 
   useEffect(() => {
     getCoupons();
-    
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -59,7 +56,7 @@ const CouponManagement = () => {
         msg.msg = "Action cancelled";
         return;
       }
-      await axios.delete(`${API_BASE}/api/${API_PATH}/admin/coupon/${id}`);
+      await api.delete(`admin/coupon/${id}`);
       getCoupons();
     } catch (err) {
       console.error("Delete Failed", err);
@@ -75,11 +72,7 @@ const CouponManagement = () => {
       dispatch(startLoading());
       const {
         data: { coupons, pagination },
-      } = await axios.get(
-        `${API_BASE}/api/${API_PATH}/admin/coupons${
-          page ? `?page=${page}` : ""
-        }`
-      );
+      } = await api.get(`admin/coupons${page ? `?page=${page}` : ""}`);
       setCurrentPage(pagination.current_page);
       setTotalPages(pagination.total_pages);
       setCoupons(

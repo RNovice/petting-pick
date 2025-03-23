@@ -1,9 +1,7 @@
 import { forwardRef, useRef, useImperativeHandle } from "react";
 import { useDispatch } from "react-redux";
-import axios from "axios";
 import { notify } from "@/slice/notificationSlice";
-
-const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
+import api from "../../services/api";
 
 const ProductModal = forwardRef(
   ({ modalData, setModalData, getOrders }, ref) => {
@@ -57,7 +55,7 @@ const ProductModal = forwardRef(
         msg: `Order updated`,
       };
       try {
-        await axios.put(`${API_BASE}/api/${API_PATH}/admin/order/${id}`, {
+        await api.put(`admin/order/${id}`, {
           data: modalData,
         });
         getOrders();
@@ -220,6 +218,6 @@ const ProductModal = forwardRef(
   }
 );
 
-ProductModal.displayName = "ProductModal"
+ProductModal.displayName = "ProductModal";
 
 export default ProductModal;

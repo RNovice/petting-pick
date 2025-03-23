@@ -1,9 +1,7 @@
 import { forwardRef, useRef, useImperativeHandle } from "react";
 import { useDispatch } from "react-redux";
-import axios from "axios";
 import { notify } from "@/slice/notificationSlice";
-
-const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
+import api from "../../services/api";
 
 const CouponModal = forwardRef(
   ({ modalData, setModalData, isEditMode, getCoupons }, ref) => {
@@ -29,7 +27,7 @@ const CouponModal = forwardRef(
     }
 
     async function handleSaveCoupon(id = null) {
-      const url = `${API_BASE}/api/${API_PATH}/admin/coupon/${id ? id : ""}`;
+      const url = `admin/coupon/${id ? id : ""}`;
 
       const couponData = {
         data: {
@@ -44,8 +42,8 @@ const CouponModal = forwardRef(
       };
       try {
         id
-          ? await axios.put(url, couponData)
-          : await axios.post(url, couponData);
+          ? await api.put(url, couponData)
+          : await api.post(url, couponData);
 
         getCoupons();
         modalRef.current?.close();

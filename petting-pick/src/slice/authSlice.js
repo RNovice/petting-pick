@@ -1,16 +1,16 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import api from "../services/api";
 
-const { VITE_API_BASE: API_BASE } = import.meta.env;
+const noApiPath = true
 
 export const loginAdmin = createAsyncThunk(
   "auth/loginAdmin",
   async ({ username, password }, { rejectWithValue }) => {
     try {
-      const res = await axios.post(`${API_BASE}/admin/signin`, { username, password });
+      const res = await api.post("admin/signin", { username, password }, { noApiPath });
       const { token, expired } = res.data;
       document.cookie = `authToken=${token};expires=${new Date(expired)};`;
-      axios.defaults.headers.common.Authorization = token;
+      api.defaults.headers.common.Authorization = token;
       return { token };
     } catch (error) {
       return rejectWithValue(error.response?.data || "Login failed");
@@ -25,8 +25,9 @@ export const checkLogin = createAsyncThunk("auth/checkLogin", async (_, { reject
       .find((row) => row.startsWith("authToken="))
       ?.split("=")[1];
     if (token === undefined) throw "Not authenticated";
-    axios.defaults.headers.common.Authorization = token;
-    await axios.post(`${API_BASE}/api/user/check`);
+    api.defaults.headers.common.Authorization = token;
+
+    await api.post("/api/user/check", {}, { noApiPath });
     return { token };
   } catch (err) {
     console.error(err)
@@ -38,7 +39,7 @@ export const checkLogin = createAsyncThunk("auth/checkLogin", async (_, { reject
 export const logoutAdmin = createAsyncThunk("auth/logoutAdmin", async (_, { rejectWithValue }) => {
 
   try {
-    const { status } = await axios.post(`${API_BASE}/logout`);
+    const { status } = await api.post("logout", {}, { noApiPath });
     if (status === 200) {
       document.cookie = "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
     }

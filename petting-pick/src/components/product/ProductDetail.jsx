@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import axios from "axios";
 import { useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
 import { addCartItem } from "@/slice/cartSlice";
 import ratingSvg from "@/assets/images/rating.svg";
 import AsideCart from "./AsideCart";
 import ProductCard from "./productCard";
-
-const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
+import api from "../../services/api";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -26,9 +24,7 @@ const ProductDetail = () => {
     if (!productData?.id) {
       (async () => {
         try {
-          const res = await axios.get(
-            `${API_BASE}/api/${API_PATH}/product/${id}`
-          );
+          const res = await api.get(`product/${id}`);
           setProducts(res.data.product);
         } catch (err) {
           const axiosError = err.response?.data?.message;
@@ -48,9 +44,7 @@ const ProductDetail = () => {
       return;
     }
     (async () => {
-      const { data } = await axios.get(
-        `${API_BASE}/api/${API_PATH}/products?category=${category}`
-      );
+      const { data } = await api.get(`products?category=${category}`);
       setRelated(data.products.filter(({ id: pid }) => id !== pid).slice(0, 3));
     })();
   }, [productData?.category, id]);

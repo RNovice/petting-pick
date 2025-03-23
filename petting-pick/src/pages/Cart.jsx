@@ -5,11 +5,9 @@ import { notify } from "@/slice/notificationSlice";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
 import { getCart, updateCartItem, removeCartItem } from "@/slice/cartSlice";
 import trashCanSvg from "@/assets/images/trash-can.svg";
-import axios from "axios";
 import { Link } from "react-router-dom";
 import OrderResult from "../components/order/OrderResult";
-
-const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
+import api from "../services/api";
 
 const Cart = () => {
   const { cart, cartTotal, cartOrigin } = useSelector((state) => state.cart);
@@ -60,7 +58,7 @@ const Cart = () => {
     const msg = { type: "success", msg: "Coupon applied" };
     try {
       dispatch(startLoading());
-      await axios.post(`${API_BASE}/api/${API_PATH}/coupon`, {
+      await api.post("coupon", {
         data: { code: coupon },
       });
       await dispatch(getCart());
@@ -80,7 +78,7 @@ const Cart = () => {
     if (!confirm("Are you sure you want to cancel the discount")) return;
     try {
       dispatch(startLoading());
-      await axios.post(`${API_BASE}/api/${API_PATH}/coupon`, {
+      await api.post("coupon", {
         data: { code: "remove" },
       });
       await dispatch(getCart());
@@ -97,7 +95,7 @@ const Cart = () => {
         return;
       }
       const message = user.message;
-      const { data } = await axios.post(`${API_BASE}/api/${API_PATH}/order`, {
+      const { data } = await api.post("order", {
         data: { user, message },
       });
       reset();

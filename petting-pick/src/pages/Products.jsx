@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
 import { addCartItem } from "@/slice/cartSlice";
@@ -7,6 +6,7 @@ import { updateProduct } from "@/slice/productSlice";
 import Paginator from "../components/common/Paginator";
 import AsideCart from "../components/product/AsideCart";
 import ProductCard from "../components/product/productCard";
+import api from "../services/api";
 const icons = import.meta.glob("@/assets/images/categories/*.svg", {
   eager: true,
 });
@@ -15,8 +15,6 @@ const iconsObj = Object.keys(icons).reduce((acc, path) => {
   acc[fileName] = icons[path].default;
   return acc;
 }, {});
-
-const { VITE_API_BASE: API_BASE, VITE_API_PATH: API_PATH } = import.meta.env;
 
 const categoriesText = ["Dog", "Small Animal", "Aquarium", "Cat", "Bird"];
 const categories = [
@@ -42,7 +40,6 @@ const Products = () => {
 
   useEffect(() => {
     getProducts();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
 
@@ -63,8 +60,8 @@ const Products = () => {
     try {
       const {
         data: { products, pagination },
-      } = await axios(
-        `${API_BASE}/api/${API_PATH}/products?page=${page}${
+      } = await api(
+        `products?page=${page}${
           categoriesText.includes(filter) ? `&category=${filter}` : ""
         }`
       );
