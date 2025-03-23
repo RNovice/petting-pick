@@ -125,53 +125,58 @@ const Cart = () => {
           )}
         </h2>
         {cart.length > 0 ? (
-          <table className="table table-sm table-bordered">
-            <thead>
-              <tr>
-                <th>Preview</th>
-                <th>Name</th>
-                <th>Amount</th>
-                <th>Price</th>
-                <th>Remove</th>
-              </tr>
-            </thead>
-            <tbody>
-              {cart.map((item) => (
-                <tr className="align-middle" key={`cart-item-${item.id}`}>
-                  <td className="p-1">
-                    <div className="ratio ratio-16x9 m-auto">
-                      <img
-                        src={item?.product.imageUrl}
-                        className="card-img-top rounded"
-                        alt={item?.product.title}
-                        style={{ objectFit: "cover", objectPosition: "center" }}
-                      />
-                    </div>
-                  </td>
-                  <td>{item.product?.title}</td>
-                  <td>
-                    <input
-                      type="number"
-                      className="form-control"
-                      value={item.qty}
-                      onChange={(e) =>
-                        handleCartItemUpdate(item.id, +e.target.value)
-                      }
-                    />
-                  </td>
-                  <td>${item.final_total}</td>
-                  <td>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleRemoveFromCart(item.id)}
-                    >
-                      Remove
-                    </button>
-                  </td>
+          <div className="table-responsive">
+            <table className="table table-sm table-bordered">
+              <thead>
+                <tr>
+                  <th>Preview</th>
+                  <th>Name</th>
+                  <th>Amount</th>
+                  <th>Price</th>
+                  <th>Remove</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {cart.map((item) => (
+                  <tr className="align-middle" key={`cart-item-${item.id}`}>
+                    <td className="p-1">
+                      <div className="ratio ratio-16x9 m-auto">
+                        <img
+                          src={item?.product.imageUrl}
+                          className="card-img-top rounded"
+                          alt={item?.product.title}
+                          style={{
+                            objectFit: "cover",
+                            objectPosition: "center",
+                          }}
+                        />
+                      </div>
+                    </td>
+                    <td>{item.product?.title}</td>
+                    <td>
+                      <input
+                        type="number"
+                        className="form-control"
+                        value={item.qty}
+                        onChange={(e) =>
+                          handleCartItemUpdate(item.id, +e.target.value)
+                        }
+                      />
+                    </td>
+                    <td>${item.final_total}</td>
+                    <td>
+                      <button
+                        className="btn btn-danger"
+                        onClick={() => handleRemoveFromCart(item.id)}
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <div className="mb-3 fs-5 d-flex gap-2">
             <span className="text-danger">No items in the cart.</span>
