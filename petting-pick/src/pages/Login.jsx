@@ -59,6 +59,7 @@ const Login = () => {
               name="username"
               type="email"
               required={true}
+              autoComplete="email"
               className="form-control"
               placeholder="Enter your email"
               value={formData.username}

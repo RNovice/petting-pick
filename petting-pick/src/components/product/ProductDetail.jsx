@@ -85,7 +85,7 @@ const ProductDetail = () => {
           <p className="text-muted">Category: {productData.category}</p>
 
           <div className="mb-3">
-            <label>Rating</label>
+            <span>Rating</span>
             <i
               className="icon"
               style={{

@@ -88,6 +88,7 @@ const AsideCart = ({ notifications }) => {
                   <td>{item.product?.title}</td>
                   <td>
                     <input
+                      name="aside-cart-qty"
                       type="number"
                       className="form-control"
                       style={{ width: "5rem" }}

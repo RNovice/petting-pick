@@ -137,8 +137,8 @@ const Cart = () => {
                 </tr>
               </thead>
               <tbody>
-                {cart.map((item) => (
-                  <tr className="align-middle" key={`cart-item-${item.id}`}>
+                {cart.map((item, i) => (
+                  <tr className="align-middle" key={`cart-item-${i}`}>
                     <td className="p-1">
                       <div className="ratio ratio-16x9 m-auto">
                         <img
@@ -156,6 +156,7 @@ const Cart = () => {
                     <td>
                       <input
                         type="number"
+                        name={`cart-item-qty-${i}`}
                         className="form-control"
                         value={item.qty}
                         onChange={(e) =>
@@ -192,6 +193,7 @@ const Cart = () => {
         <div className="mb-3 d-flex gap-3">
           <input
             type="text"
+            name="coupon"
             className="form-control"
             value={coupon}
             onChange={({ target }) => setCoupon(target.value)}
@@ -226,9 +228,16 @@ const Cart = () => {
         <h2>Customer Information</h2>
         <form onSubmit={handleSubmit(submitOrder)}>
           <div className="mb-3">
-            <label className="form-label required-field">Name</label>
+            <label
+              htmlFor="customer-name"
+              className="form-label required-field"
+            >
+              Name
+            </label>
             <input
+              id="customer-name"
               type="text"
+              autoComplete="name"
               className="form-control"
               {...register("name", { required: "Name is required" })}
             />
@@ -237,9 +246,16 @@ const Cart = () => {
             )}
           </div>
           <div className="mb-3">
-            <label className="form-label required-field">Email</label>
+            <label
+              htmlFor="customer-email"
+              className="form-label required-field"
+            >
+              Email
+            </label>
             <input
+              id="customer-email"
               type="email"
+              autoComplete="email"
               className="form-control"
               {...register("email", {
                 required: "Email is required",
@@ -254,9 +270,16 @@ const Cart = () => {
             )}
           </div>
           <div className="mb-3">
-            <label className="form-label required-field">Phone</label>
+            <label
+              htmlFor="customer-phone"
+              className="form-label required-field"
+            >
+              Phone
+            </label>
             <input
+              id="customer-phone"
               type="tel"
+              autoComplete="tel"
               className="form-control"
               {...register("tel", {
                 required: "Phone is required",
@@ -269,9 +292,16 @@ const Cart = () => {
             {errors.tel && <p className="text-danger">{errors.tel.message}</p>}
           </div>
           <div className="mb-3">
-            <label className="form-label required-field">Address</label>
+            <label
+              htmlFor="customer-address"
+              className="form-label required-field"
+            >
+              Address
+            </label>
             <textarea
+              id="customer-address"
               className="form-control"
+              autoComplete="address"
               rows="3"
               {...register("address", { required: "Address is required" })}
             ></textarea>
@@ -280,8 +310,11 @@ const Cart = () => {
             )}
           </div>
           <div className="mb-3">
-            <label className="form-label">Message</label>
+            <label htmlFor="customer-message" className="form-label">
+              Message
+            </label>
             <textarea
+              id="customer-message"
               className="form-control"
               rows="3"
               {...register("message")}
