@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { notify } from "@/slice/notificationSlice";
 import api from "../../services/api";
 
-const ProductModal = forwardRef(
+const OrderModal = forwardRef(
   ({ modalData, setModalData, getOrders }, ref) => {
     const modalRef = useRef(null);
     const dispatch = useDispatch();
@@ -218,6 +218,6 @@ const ProductModal = forwardRef(
   }
 );
 
-ProductModal.displayName = "ProductModal";
+OrderModal.displayName = "OrderModal";
 
-export default ProductModal;
+export default OrderModal;
