@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginAdmin } from "@/slice/authSlice";
 import { Link } from "react-router-dom";
 import { startLoading, stopLoading } from "@/slice/loadingSlice";
+import { notify } from "@/slice/notificationSlice";
 
 const env = import.meta.env;
 
@@ -15,15 +16,27 @@ const Login = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    status === "checking"
-      ? dispatch(
-          startLoading({
-            text: "Checking Authentication",
-            color: "#aaa",
-            bgColor: "#fff",
-          })
-        )
-      : dispatch(stopLoading());
+    if (status === "checking") {
+      dispatch(
+        startLoading({
+          text: "Checking Authentication",
+          color: "#aaa",
+          bgColor: "#fff",
+        })
+      );
+    } else {
+      dispatch(stopLoading());
+    }
+
+    if (status === "failed") {
+      dispatch(
+        notify({
+          type: "fail",
+          msg: "Login failed, please check email or password",
+        })
+      );
+    }
+
     return () => {
       dispatch(stopLoading());
     };

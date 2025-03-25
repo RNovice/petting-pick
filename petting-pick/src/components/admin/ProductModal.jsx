@@ -74,7 +74,15 @@ const ProductModal = forwardRef(
       } catch (err) {
         msg.type = "fail";
         const axiosError = err.response?.data.message;
-        const errorMsg = `Product ${id ? "update" : "add"} failed`;
+        let errorMsg = `Product ${id ? "update" : "add"} failed. `;
+        if (Array.isArray(axiosError)) {
+          const translatedErrors = axiosError
+            .filter((msg) => msg.includes("屬性不得為空"))
+            .map((msg) => msg.replace("屬性不得為空", "field can't be empty"))
+            .join(", ");
+
+          if (translatedErrors) errorMsg += translatedErrors;
+        }
         console.error(errorMsg, axiosError || err);
         msg.msg = errorMsg;
       } finally {
@@ -108,7 +116,14 @@ const ProductModal = forwardRef(
     return (
       <dialog className="modal-env" ref={modalRef}>
         <div className="modal-dialog modal-xl">
-          <div className="modal-content" style={{ maxHeight: "85vh" }}>
+          <form
+            className="modal-content"
+            style={{ maxHeight: "85vh" }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSaveProduct(modalData.id ? modalData.id : null);
+            }}
+          >
             <div className="modal-header">
               <h5 className="modal-title">
                 {isEditMode ? "Edit Product" : "Add New Product"}
@@ -192,7 +207,9 @@ const ProductModal = forwardRef(
                           />
                         </label>
                         {uploadingId === `upload-other-img-${i + 1}` ? (
-                          <div className="uploading form-control">上傳中</div>
+                          <div className="uploading form-control">
+                            Uploading
+                          </div>
                         ) : (
                           <input
                             id={`modal-input-other-img-${i + 1}`}
@@ -246,16 +263,17 @@ const ProductModal = forwardRef(
                 <div className="col">
                   <div className="mb-3">
                     <label
-                      className=" required-field"
+                      className="required-field"
                       htmlFor="modal-input-title"
                     >
                       Title
                     </label>
                     <input
-                      id="modal-input-title"
                       type="text"
-                      className="form-control"
                       name="title"
+                      id="modal-input-title"
+                      className="form-control"
+                      required={true}
                       value={modalData.title}
                       onChange={handleInputChange}
                     />
@@ -263,32 +281,34 @@ const ProductModal = forwardRef(
                   <div className="row">
                     <div className="col-md-6 mb-3">
                       <label
-                        className=" required-field"
+                        className="required-field"
                         htmlFor="modal-input-category"
                       >
                         Category
                       </label>
                       <input
-                        id="modal-input-category"
                         type="text"
-                        className="form-control"
                         name="category"
+                        id="modal-input-category"
+                        className="form-control"
+                        required={true}
                         value={modalData.category}
                         onChange={handleInputChange}
                       />
                     </div>
                     <div className="col-md-6 mb-3">
                       <label
-                        className=" required-field"
+                        className="required-field"
                         htmlFor="modal-input-unit"
                       >
                         Unit
                       </label>
                       <input
-                        id="modal-input-unit"
                         type="text"
-                        className="form-control"
                         name="unit"
+                        id="modal-input-unit"
+                        className="form-control"
+                        required={true}
                         value={modalData.unit}
                         onChange={handleInputChange}
                       />
@@ -392,17 +412,11 @@ const ProductModal = forwardRef(
               >
                 Cancel
               </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() =>
-                  handleSaveProduct(modalData.id ? modalData.id : null)
-                }
-              >
+              <button type="submit" className="btn btn-primary">
                 Save
               </button>
             </div>
-          </div>
+          </form>
         </div>
       </dialog>
     );
