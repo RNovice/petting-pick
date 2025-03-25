@@ -32,9 +32,9 @@ export const removeCartItem = createAsyncThunk("cart/removeCartItem", async (id 
   }
 });
 
-export const updateCartItem = createAsyncThunk("cart/updateCartItem", async ({ product_id, qty }, { rejectWithValue, dispatch }) => {
+export const updateCartItem = createAsyncThunk("cart/updateCartItem", async ({ id, product_id, qty }, { rejectWithValue, dispatch }) => {
   try {
-    const url = `${CART_API}/${product_id}`;
+    const url = `${CART_API}/${id}`;
     qty > 0
       ? await api.put(url, { data: { product_id, qty } })
       : await api.delete(url);

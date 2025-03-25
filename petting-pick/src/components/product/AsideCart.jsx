@@ -13,10 +13,10 @@ const AsideCart = ({ notifications }) => {
   const dispatch = useDispatch();
   const cartRef = useRef(null);
 
-  async function handleCartItemUpdate(product_id, qty) {
+  async function handleCartItemUpdate(id, product_id, qty) {
     try {
       setIsAsideCartLoading(true);
-      await dispatch(updateCartItem({ product_id, qty }));
+      await dispatch(updateCartItem({ id, product_id, qty }));
     } finally {
       setIsAsideCartLoading(false);
     }
@@ -94,7 +94,11 @@ const AsideCart = ({ notifications }) => {
                       style={{ width: "5rem" }}
                       value={item.qty}
                       onChange={(e) =>
-                        handleCartItemUpdate(item.id, +e.target.value)
+                        handleCartItemUpdate(
+                          item.id,
+                          item.product_id,
+                          +e.target.value
+                        )
                       }
                     />
                   </td>

@@ -36,10 +36,10 @@ const Cart = () => {
     };
   }, []);
 
-  async function handleCartItemUpdate(product_id, qty) {
+  async function handleCartItemUpdate(id, product_id, qty) {
     try {
       dispatch(startLoading());
-      await dispatch(updateCartItem({ product_id, qty }));
+      await dispatch(updateCartItem({ id, product_id, qty }));
     } finally {
       dispatch(stopLoading());
     }
@@ -160,7 +160,11 @@ const Cart = () => {
                         className="form-control"
                         value={item.qty}
                         onChange={(e) =>
-                          handleCartItemUpdate(item.id, +e.target.value)
+                          handleCartItemUpdate(
+                            item.id,
+                            item.product_id,
+                            +e.target.value
+                          )
                         }
                       />
                     </td>
