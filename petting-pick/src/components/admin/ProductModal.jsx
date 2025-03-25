@@ -91,7 +91,9 @@ const ProductModal = forwardRef(
         formData.append("file-to-upload", file);
         const {
           data: { imageUrl },
-        } = await api.post("admin/upload", formData);
+        } = await api.post("admin/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         index === null
           ? setModalData({ ...modalData, imageUrl })
           : handleImagesInputChange(imageUrl, index);
@@ -136,7 +138,7 @@ const ProductModal = forwardRef(
                           className="d-none"
                           type="file"
                           id="upload-main-img"
-                          accept="image/*"
+                          accept="image/png, image/jpeg"
                           onClick={(e) =>
                             uploadingId !== null && e.preventDefault()
                           }
@@ -144,7 +146,7 @@ const ProductModal = forwardRef(
                         />
                       </label>
                       {uploadingId === "upload-main-img" ? (
-                        <div className="uploading form-control">上傳中</div>
+                        <div className="uploading form-control">Uploading</div>
                       ) : (
                         <input
                           id="modal-input-main-img"
