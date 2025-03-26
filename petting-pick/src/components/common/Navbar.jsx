@@ -15,9 +15,9 @@ function Navbar({ navItems = [] }) {
         <NavLink className="navbar-brand" to="/">
           <img src={LogoSvg} alt="Logo" width={40} height={40} />
         </NavLink>
-        <ul className="navbar-nav">
+        <ul className="navbar-nav gap-4">
           {navItems.map((item, i) => (
-            <li className="nav-item" key={`nav-item-${item.path}-${i}`}>
+            <li className="navbar-item" key={`nav-item-${item.path}-${i}`}>
               <NavLink className="nav-link" to={item.path}>
                 {item.name}
               </NavLink>
